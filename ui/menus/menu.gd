@@ -1,7 +1,7 @@
 extends Control
 class_name Menu
 
-enum Type {MAIN, POWER, COOLANT, BREAKERS, MINING, REFINING, ASSEMBLY, LAUNCH}
+enum Type {MAIN, STATION, NODE_MAP, PAUSE}
 
 var manager: MenuManager = null
 var data: GameData = null

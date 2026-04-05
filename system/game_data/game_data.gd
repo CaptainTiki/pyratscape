@@ -15,6 +15,7 @@ var player_boost_multiplier: float = 1.7
 var player_mining_damage: float = 18.0
 var player_tractor_range: float = 7.5
 var cleared_runs: int = 0
+var node_map: NodeMapData = null
 
 func _ready() -> void:
 	instance = self
@@ -32,6 +33,8 @@ func reset_for_new_game() -> void:
 	player_mining_damage = 18.0
 	player_tractor_range = 7.5
 	cleared_runs = 0
+	node_map = NodeMapData.new()
+	node_map.generate()
 
 func repair_player_full() -> void:
 	player_hull = player_max_hull

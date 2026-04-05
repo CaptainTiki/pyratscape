@@ -15,8 +15,10 @@ const PROJECTILE_SCENE: PackedScene = preload("res://world/combat/projectile.tsc
 @export var fire_cooldown: float = 0.22
 @export var secondary_cooldown: float = 0.6
 @export var projectile_damage: float = 12.0
-@export var mining_damage: float = 18.0
+@export var missile_damage: float = 18.0
 @export var tractor_range: float = 7.5
+@export var collision_damage_scale: float = 0.42
+@export var collision_damage_cooldown: float = 0.3
 
 var world: WorldRoot = null
 var projectile_parent: Node3D = null
@@ -27,6 +29,7 @@ var current_speed: float = 0.0
 var boost_timer: float = 0.0
 var forward_tap_timer: float = 0.0
 var tractor_active: bool = false
+var collision_damage_timer: float = 0.0
 
 @onready var muzzle_left: Node3D = $MuzzleLeft
 @onready var muzzle_right: Node3D = $MuzzleRight
@@ -51,7 +54,9 @@ func _physics_process(delta: float) -> void:
 	secondary_fire_timer = maxf(0.0, secondary_fire_timer - delta)
 	boost_timer = maxf(0.0, boost_timer - delta)
 	forward_tap_timer = maxf(0.0, forward_tap_timer - delta)
+	collision_damage_timer = maxf(0.0, collision_damage_timer - delta)
 	_handle_movement(delta)
+	_handle_collisions()
 	_handle_fire()
 	_handle_secondary_fire()
 	_handle_tractor(delta)
@@ -87,6 +92,34 @@ func _handle_movement(delta: float) -> void:
 	move_and_slide()
 	global_position.y = 1.25
 
+func _handle_collisions() -> void:
+	if collision_damage_timer > 0.0:
+		return
+	var highest_impact: float = 0.0
+	var impacted_bodies: Array[Node] = []
+	for collision_index in range(get_slide_collision_count()):
+		var collision: KinematicCollision3D = get_slide_collision(collision_index)
+		var collider: Node = collision.get_collider() as Node
+		if collider == null:
+			continue
+		var impact_speed: float = absf(current_speed)
+		if impact_speed < 6.0:
+			continue
+		highest_impact = maxf(highest_impact, impact_speed)
+		if not impacted_bodies.has(collider):
+			impacted_bodies.append(collider)
+	if highest_impact <= 0.0:
+		return
+	var collision_damage: int = maxi(1, int(round(highest_impact * collision_damage_scale)))
+	apply_damage(collision_damage)
+	for collider in impacted_bodies:
+		if collider.has_method("apply_collision_damage"):
+			collider.apply_collision_damage(collision_damage)
+		elif collider.has_method("apply_damage") and collider != self:
+			collider.apply_damage(collision_damage)
+	current_speed *= -0.35
+	collision_damage_timer = collision_damage_cooldown
+
 func _handle_fire() -> void:
 	if not Input.is_action_pressed("fire_primary"):
 		return
@@ -95,8 +128,8 @@ func _handle_fire() -> void:
 	if projectile_parent == null:
 		return
 	fire_timer = fire_cooldown
-	_spawn_projectile(muzzle_left.global_position, -global_basis.z, projectile_damage, false, 48.0, 0.2)
-	_spawn_projectile(muzzle_right.global_position, -global_basis.z, projectile_damage, false, 48.0, 0.2)
+	_spawn_projectile(muzzle_left.global_position, -global_basis.z, projectile_damage, 48.0, 0.2)
+	_spawn_projectile(muzzle_right.global_position, -global_basis.z, projectile_damage, 48.0, 0.2)
 
 func _handle_secondary_fire() -> void:
 	if not Input.is_action_pressed("fire_secondary"):
@@ -106,14 +139,13 @@ func _handle_secondary_fire() -> void:
 	if projectile_parent == null:
 		return
 	secondary_fire_timer = secondary_cooldown
-	_spawn_projectile(missile_muzzle.global_position, -global_basis.z, mining_damage, true, 26.0, 0.4)
+	_spawn_projectile(missile_muzzle.global_position, -global_basis.z, missile_damage, 26.0, 0.4)
 
-func _spawn_projectile(spawn_position: Vector3, shot_direction: Vector3, damage_amount: float, mining_shot: bool, projectile_speed: float, projectile_scale: float) -> void:
+func _spawn_projectile(spawn_position: Vector3, shot_direction: Vector3, damage_amount: float, projectile_speed: float, projectile_scale: float) -> void:
 	var projectile: Projectile = PROJECTILE_SCENE.instantiate() as Projectile
 	projectile.global_position = spawn_position
 	projectile.direction = shot_direction
 	projectile.damage = damage_amount
-	projectile.is_mining = mining_shot
 	projectile.source = self
 	projectile.speed = projectile_speed
 	projectile.scale = Vector3.ONE * projectile_scale
@@ -170,7 +202,7 @@ func _sync_from_game_data() -> void:
 	hull = GameData.instance.player_hull
 	fire_cooldown = GameData.instance.player_fire_rate
 	projectile_damage = GameData.instance.player_damage
-	mining_damage = GameData.instance.player_mining_damage
+	missile_damage = GameData.instance.player_mining_damage
 	tractor_range = GameData.instance.player_tractor_range
 	var shape: CollisionShape3D = tractor_area.get_node("CollisionShape3D") as CollisionShape3D
 	var sphere: SphereShape3D = shape.shape as SphereShape3D

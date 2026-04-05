@@ -30,11 +30,13 @@ label_settings = SubResource("LabelSettings_xbn2l")
 horizontal_alignment = 1
 
 [node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=832473007]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
 text = "Play"
 
 [node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=400721346]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
 text = "Quit"

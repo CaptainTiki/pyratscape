@@ -17,6 +17,7 @@ var projectile_parent: Node3D = null
 var hull: int = 34
 var fire_timer: float = 0.4
 var station_attack_timer: float = 1.2
+var collision_damage_timer: float = 0.0
 
 @onready var muzzle: Node3D = $Muzzle
 
@@ -25,6 +26,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	var world: WorldRoot = get_tree().get_first_node_in_group("world_root") as WorldRoot
+	collision_damage_timer = maxf(0.0, collision_damage_timer - delta)
 	if target == null or not is_instance_valid(target):
 		velocity = Vector3.ZERO
 		move_and_slide()
@@ -44,6 +46,7 @@ func _physics_process(delta: float) -> void:
 		basis = basis.slerp(Basis.looking_at(to_target.normalized(), Vector3.UP), 6.0 * delta)
 	move_and_slide()
 	global_position.y = 1.25
+	_handle_collisions()
 	if world != null:
 		var station_distance: float = global_position.distance_to(world.station_anchor.global_position)
 		if station_distance <= 6.0 and station_attack_timer <= 0.0:
@@ -51,6 +54,21 @@ func _physics_process(delta: float) -> void:
 			station_attack_timer = 1.2
 	if distance <= 18.0:
 		_try_fire()
+
+func _handle_collisions() -> void:
+	if collision_damage_timer > 0.0:
+		return
+	for collision_index in range(get_slide_collision_count()):
+		var collision: KinematicCollision3D = get_slide_collision(collision_index)
+		var collider: Node = collision.get_collider() as Node
+		if collider == null or collider == self:
+			continue
+		var impact_damage: int = maxi(1, int(round(velocity.length() * 0.2)))
+		apply_damage(impact_damage)
+		if collider.has_method("apply_collision_damage"):
+			collider.apply_collision_damage(impact_damage)
+		collision_damage_timer = 0.35
+		break
 
 func _try_fire() -> void:
 	if fire_timer > 0.0:
@@ -71,6 +89,9 @@ func apply_damage(amount: int) -> void:
 		_spawn_pickups()
 		destroyed.emit(self)
 		queue_free()
+
+func apply_collision_damage(amount: int) -> void:
+	apply_damage(amount)
 
 func _spawn_pickups() -> void:
 	var world: WorldRoot = get_tree().get_first_node_in_group("world_root") as WorldRoot

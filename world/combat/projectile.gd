@@ -23,7 +23,7 @@ func _on_body_entered(body: Node) -> void:
 	if body == source:
 		return
 	if body.has_method("apply_damage"):
-		body.apply_damage(int(round(damage)))
+		body.apply_damage(damage)
 		queue_free()
 	elif is_mining and body.has_method("apply_mining_damage"):
 		body.apply_mining_damage(damage)
@@ -33,7 +33,7 @@ func _on_area_entered(area: Area3D) -> void:
 	if area == source:
 		return
 	if area.has_method("apply_damage"):
-		area.apply_damage(int(round(damage)))
+		area.apply_damage(damage)
 		queue_free()
 	elif is_mining and area.has_method("apply_mining_damage"):
 		area.apply_mining_damage(damage)

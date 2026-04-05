@@ -1,6 +1,12 @@
 extends Menu
 class_name MainMenu
 
+@onready var play_button: Button = %PlayButton
+@onready var quit_button: Button = %QuitButton
+
+func _ready() -> void:
+	super._ready()
+
 func _on_play_button_pressed() -> void:
 	var game_data: GameData = GameData.instance
 	if game_data == null:

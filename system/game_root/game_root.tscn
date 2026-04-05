@@ -1,14 +1,24 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://deslccio18fh1"]
 
-[ext_resource type="Script" path="res://system/game_root/game_root.gd" id="1"]
-[ext_resource type="PackedScene" path="res://world/world_root.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://ui/hud/game_hud.tscn" id="3"]
+[ext_resource type="Script" uid="uid://djbitq0ighege" path="res://system/game_root/game_root.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://b5fxb3bq62sxl" path="res://world/world_root.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://tlgey6e7fdxl" path="res://ui/hud/game_hud.tscn" id="3"]
 
-[node name="GameRoot" type="Node3D"]
+[node name="GameRoot" type="Node3D" unique_id=1076117163]
 script = ExtResource("1")
 
-[node name="World" parent="." instance=ExtResource("2")]
+[node name="World" parent="." unique_id=707738131 instance=ExtResource("2")]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=56954648]
 
-[node name="GameHUD" parent="CanvasLayer" instance=ExtResource("3")]
+[node name="GameHUD" parent="CanvasLayer" unique_id=399741293 instance=ExtResource("3")]
+
+[node name="FadeRect" type="ColorRect" parent="CanvasLayer" unique_id=1219588937]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

@@ -3,7 +3,7 @@ class_name Main
 
 @onready var menu_manager: MenuManager = %MenuManager
 
-var game_root: Node = null
+var game_root: GameRoot = null
 
 func _ready() -> void:
 	menu_manager.show_menu(Menu.Type.MAIN)
@@ -12,13 +12,24 @@ func start_game() -> void:
 	if game_root != null:
 		game_root.queue_free()
 		game_root = null
-	game_root = Prefabs.game_root_scene.instantiate()
+	game_root = Prefabs.game_root_scene.instantiate() as GameRoot
 	add_child(game_root)
 	move_child(game_root, 0)
 	menu_manager.hide_current_menu()
 
 func return_to_main_menu() -> void:
+	menu_manager.show_menu(Menu.Type.MAIN)
 	if game_root != null:
 		game_root.queue_free()
 		game_root = null
-	menu_manager.show_menu(Menu.Type.MAIN)
+
+func show_station_menu() -> void:
+	menu_manager.show_menu(Menu.Type.STATION)
+
+func redeploy_current_game() -> void:
+	if game_root == null:
+		start_game()
+		return
+	menu_manager.hide_current_menu()
+	game_root.world.redeploy_node()
+	game_root.fade_from_black()
