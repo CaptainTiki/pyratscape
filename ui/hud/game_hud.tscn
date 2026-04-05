@@ -1,0 +1,161 @@
+[gd_scene format=3 uid="uid://tlgey6e7fdxl"]
+
+[ext_resource type="Script" uid="uid://dosse52vde00x" path="res://ui/hud/game_hud.gd" id="1"]
+
+[node name="GameHUD" type="Control" unique_id=957560134]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1128975794]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1778839996]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TopRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1992817103]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HullPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopRow" unique_id=213059304]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HullLabel" type="Label" parent="MarginContainer/VBoxContainer/TopRow/HullPanel" unique_id=1836766380]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Hull"
+
+[node name="ResourcesPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TopRow" unique_id=379793359]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResourcesLabel" type="Label" parent="MarginContainer/VBoxContainer/TopRow/ResourcesPanel" unique_id=1018435943]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Resources"
+
+[node name="MissionPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1674124646]
+layout_mode = 2
+
+[node name="MissionLabel" type="Label" parent="MarginContainer/VBoxContainer/MissionPanel" unique_id=282003367]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Mission"
+
+[node name="HintLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=587924451]
+layout_mode = 2
+text = "Up thrust  Double-tap Up boost  Down reverse  Left/Right turn  Q guns  W missiles  E tractor  F call/dock  Esc menu"
+
+
+[node name="NodeLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=115879245]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Node Status"
+
+[node name="MapPanel" type="PanelContainer" parent="." unique_id=98215377]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -280.0
+offset_top = -180.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MapPanel" unique_id=677381122]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="MapPanel/VBoxContainer" unique_id=559127733]
+layout_mode = 2
+text = "Node Map"
+horizontal_alignment = 1
+
+[node name="Info" type="Label" parent="MapPanel/VBoxContainer" unique_id=1084439911]
+layout_mode = 2
+text = "For now, redeploy just resets the node and launches you again."
+autowrap_mode = 2
+
+[node name="RedeployButton" type="Button" parent="MapPanel/VBoxContainer" unique_id=853777194]
+layout_mode = 2
+text = "Redeploy"
+
+[node name="Hint" type="Label" parent="MapPanel/VBoxContainer" unique_id=133775911]
+layout_mode = 2
+text = "Press F while docked to close this panel."
+horizontal_alignment = 1
+
+[node name="UpgradesPanel" type="PanelContainer" parent="." unique_id=2142969748]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -140.0
+offset_right = 180.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UpgradesPanel" unique_id=1464554161]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="UpgradesPanel/VBoxContainer" unique_id=343794337]
+layout_mode = 2
+text = "Station Fabricator"
+horizontal_alignment = 1
+
+[node name="Info" type="Label" parent="UpgradesPanel/VBoxContainer" unique_id=2093935218]
+layout_mode = 2
+text = "Open after clearing enemies while docked."
+horizontal_alignment = 1
+
+[node name="UpgradeDamageButton" type="Button" parent="UpgradesPanel/VBoxContainer" unique_id=880140831]
+layout_mode = 2
+text = "Upgrade Damage (20+ Scrap)"
+
+[node name="UpgradeRateButton" type="Button" parent="UpgradesPanel/VBoxContainer" unique_id=703643977]
+layout_mode = 2
+text = "Upgrade Fire Rate (25+ Scrap, 1 Crystal)"
+
+[node name="UpgradeHullButton" type="Button" parent="UpgradesPanel/VBoxContainer" unique_id=1057443809]
+layout_mode = 2
+text = "Upgrade Hull (18+ Scrap)"
+
+[node name="UpgradeMiningButton" type="Button" parent="UpgradesPanel/VBoxContainer" unique_id=1455235316]
+layout_mode = 2
+text = "Upgrade Mining (15+ Scrap)"
+
+[node name="CloseLabel" type="Label" parent="UpgradesPanel/VBoxContainer" unique_id=368241198]
+layout_mode = 2
+text = "Press F again while docked to close."
+horizontal_alignment = 1
+
+[connection signal="pressed" from="UpgradesPanel/VBoxContainer/UpgradeDamageButton" to="." method="_on_upgrade_damage_button_pressed"]
+[connection signal="pressed" from="UpgradesPanel/VBoxContainer/UpgradeRateButton" to="." method="_on_upgrade_rate_button_pressed"]
+[connection signal="pressed" from="UpgradesPanel/VBoxContainer/UpgradeHullButton" to="." method="_on_upgrade_hull_button_pressed"]
+[connection signal="pressed" from="UpgradesPanel/VBoxContainer/UpgradeMiningButton" to="." method="_on_upgrade_mining_button_pressed"]
+
+[connection signal="pressed" from="MapPanel/VBoxContainer/RedeployButton" to="." method="_on_redeploy_button_pressed"]

@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://dvd3tsoe5fwt1"]
+
+[ext_resource type="Script" uid="uid://v8ksium7y400" path="res://system/menu_manager/menu_manager.gd" id="1_6k81i"]
+
+[node name="MenuManager" type="Control" unique_id=1457739170]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_6k81i")

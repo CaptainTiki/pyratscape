@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://2alhfho5j7vs"]
+
+[ext_resource type="Script" uid="uid://c1xuhtru1ry3x" path="res://system/main/main.gd" id="1_fn85g"]
+[ext_resource type="PackedScene" uid="uid://dvd3tsoe5fwt1" path="res://system/menu_manager/menu_manager.tscn" id="2_w8du4"]
+
+[node name="Main" type="Node3D" unique_id=643198226]
+script = ExtResource("1_fn85g")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1836260710]
+
+[node name="MenuManager" parent="CanvasLayer" unique_id=1457739170 instance=ExtResource("2_w8du4")]
+unique_name_in_owner = true

@@ -1,0 +1,117 @@
+[gd_scene format=3 uid="uid://b5fxb3bq62sxl"]
+
+[ext_resource type="Script" uid="uid://bmnsxciia3031" path="res://world/world_root.gd" id="1"]
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+background_color = Color(0.005, 0.008, 0.02, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.5, 0.6, 0.9, 1)
+ambient_light_energy = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_star"]
+albedo_color = Color(0.8, 0.9, 1, 1)
+emission_enabled = true
+emission = Color(0.9, 0.95, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_star"]
+radius = 0.12
+height = 0.24
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(200, 1, 200)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.03, 0.04, 0.08, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(200, 200)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_station"]
+albedo_color = Color(0.19, 0.46, 0.76, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_station"]
+top_radius = 3.0
+bottom_radius = 4.0
+height = 2.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dish"]
+albedo_color = Color(0.9, 0.62, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dish"]
+size = Vector3(6, 0.4, 6)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_station_range"]
+radius = 7.0
+
+[node name="WorldRoot" type="Node3D" unique_id=483408055]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1557168535]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=208847051]
+transform = Transform3D(1, 0, 0, 0, 0.6967067, 0.7173561, 0, -0.7173561, 0.6967067, 0, 0, 0)
+light_energy = 2.0
+shadow_enabled = true
+
+[node name="StarA" type="MeshInstance3D" parent="." unique_id=30849077]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 18, -58)
+material_override = SubResource("StandardMaterial3D_star")
+mesh = SubResource("SphereMesh_star")
+
+[node name="StarB" type="MeshInstance3D" parent="." unique_id=1938503152]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55, 22, -44)
+material_override = SubResource("StandardMaterial3D_star")
+mesh = SubResource("SphereMesh_star")
+
+[node name="StarC" type="MeshInstance3D" parent="." unique_id=195776789]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 16, -70)
+material_override = SubResource("StandardMaterial3D_star")
+mesh = SubResource("SphereMesh_star")
+
+[node name="StarD" type="MeshInstance3D" parent="." unique_id=1310554412]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -62, 12, -36)
+material_override = SubResource("StandardMaterial3D_star")
+mesh = SubResource("SphereMesh_star")
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=1856130848]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=895802636]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=1151467471]
+transform = Transform3D(1, 0, 0, 0, -3.6199901e-06, 1, 0, -1, -3.6199901e-06, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_ground")
+mesh = SubResource("PlaneMesh_ground")
+
+[node name="StationAnchor" type="Node3D" parent="." unique_id=695837133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="StationBody" type="MeshInstance3D" parent="StationAnchor" unique_id=1474291550]
+material_override = SubResource("StandardMaterial3D_station")
+mesh = SubResource("CylinderMesh_station")
+
+[node name="StationDish" type="MeshInstance3D" parent="StationAnchor" unique_id=2018051400]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+material_override = SubResource("StandardMaterial3D_dish")
+mesh = SubResource("BoxMesh_dish")
+
+[node name="StationArea" type="Area3D" parent="StationAnchor" unique_id=55609550]
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StationAnchor/StationArea" unique_id=1550777914]
+shape = SubResource("SphereShape3D_station_range")
+
+[node name="Actors" type="Node3D" parent="." unique_id=1900655857]
+
+[node name="Projectiles" type="Node3D" parent="." unique_id=159519458]
+
+[node name="Pickups" type="Node3D" parent="." unique_id=799827431]
+
+[node name="CameraRig" type="Node3D" parent="." unique_id=1254095006]
+transform = Transform3D(1, 0, 0, 0, 0.40848747, 0.91276395, 0, -0.91276395, 0.40848747, 0, 24, 10)
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=861752085]
+current = true
