@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://world/enemies/enemy_ship.gd" id="1"]
+[ext_resource type="Script" path="res://world/health_component.gd" id="2_health"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enemy"]
 radius = 0.75
@@ -42,3 +43,7 @@ material_override = SubResource("StandardMaterial3D_enemy_wing")
 
 [node name="Muzzle" type="Node3D" parent="."]
 position = Vector3(0, 0, -1.5)
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 34

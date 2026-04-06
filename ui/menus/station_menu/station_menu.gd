@@ -51,9 +51,9 @@ func _apply_upgrades() -> void:
 			world.player._sync_from_game_data()
 	_refresh()
 
-func _on_node_map_button_pressed() -> void:
+func _on_sector_map_button_pressed() -> void:
 	if manager != null:
-		manager.show_menu(Menu.Type.NODE_MAP)
+		manager.show_menu(Menu.Type.SECTOR_MAP)
 
 func _on_redeploy_button_pressed() -> void:
 	var main: Main = get_tree().current_scene as Main

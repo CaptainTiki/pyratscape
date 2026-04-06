@@ -15,7 +15,7 @@ var player_boost_multiplier: float = 1.7
 var player_mining_damage: float = 18.0
 var player_tractor_range: float = 7.5
 var cleared_runs: int = 0
-var node_map: NodeMapData = null
+var sector_map: SectorMapData = null
 
 func _ready() -> void:
 	instance = self
@@ -33,8 +33,8 @@ func reset_for_new_game() -> void:
 	player_mining_damage = 18.0
 	player_tractor_range = 7.5
 	cleared_runs = 0
-	node_map = NodeMapData.new()
-	node_map.generate()
+	sector_map = SectorMapData.new()
+	sector_map.generate()
 
 func repair_player_full() -> void:
 	player_hull = player_max_hull
@@ -56,26 +56,30 @@ func spend(cost_scrap: int, cost_crystals: int) -> bool:
 	return true
 
 func buy_damage_upgrade() -> bool:
-	if not spend(20 + (cleared_runs * 4), 0):
+	var cost_scrap: int = 20 + cleared_runs * 4
+	if not spend(cost_scrap, 0):
 		return false
 	player_damage += 3.0
 	return true
 
 func buy_fire_rate_upgrade() -> bool:
-	if not spend(25 + (cleared_runs * 5), 1):
+	var cost_scrap: int = 25 + cleared_runs * 5
+	if not spend(cost_scrap, 1):
 		return false
-	player_fire_rate = maxf(0.08, player_fire_rate - 0.025)
+	player_fire_rate = maxf(0.08, player_fire_rate - 0.015)
 	return true
 
 func buy_hull_upgrade() -> bool:
-	if not spend(18 + (cleared_runs * 4), 0):
+	var cost_scrap: int = 18 + cleared_runs * 4
+	if not spend(cost_scrap, 0):
 		return false
-	player_max_hull += 15
+	player_max_hull += 12
 	player_hull = player_max_hull
 	return true
 
 func buy_mining_upgrade() -> bool:
-	if not spend(15 + (cleared_runs * 3), 0):
+	var cost_scrap: int = 15 + cleared_runs * 3
+	if not spend(cost_scrap, 0):
 		return false
-	player_mining_damage += 6.0
+	player_mining_damage += 4.0
 	return true

@@ -1,4 +1,4 @@
-extends CharacterBody3D
+extends ShipEntity
 class_name EnemyShip
 
 signal destroyed(enemy: EnemyShip)
@@ -6,23 +6,22 @@ signal destroyed(enemy: EnemyShip)
 const PROJECTILE_SCENE: PackedScene = preload("res://world/combat/projectile.tscn")
 const PICKUP_SCENE: PackedScene = preload("res://world/props/resource_pickup.tscn")
 
-@export var max_hull: int = 34
 @export var move_speed: float = 13.0
 @export var fire_cooldown: float = 1.0
 @export var projectile_damage: float = 8.0
 @export var preferred_range: float = 12.0
 
 var target: PlayerShip = null
-var projectile_parent: Node3D = null
-var hull: int = 34
 var fire_timer: float = 0.4
 var station_attack_timer: float = 1.2
 var collision_damage_timer: float = 0.0
 
 @onready var muzzle: Node3D = $Muzzle
+@onready var _health: HealthComponent = $HealthComponent
 
 func _ready() -> void:
-	hull = max_hull
+	health = _health
+	health.destroyed.connect(_on_health_depleted)
 
 func _physics_process(delta: float) -> void:
 	var world: WorldRoot = get_tree().get_first_node_in_group("world_root") as WorldRoot
@@ -83,15 +82,10 @@ func _try_fire() -> void:
 	projectile.source = self
 	projectile_parent.add_child(projectile)
 
-func apply_damage(amount: int) -> void:
-	hull = maxi(0, hull - amount)
-	if hull <= 0:
-		_spawn_pickups()
-		destroyed.emit(self)
-		queue_free()
-
-func apply_collision_damage(amount: int) -> void:
-	apply_damage(amount)
+func _on_health_depleted() -> void:
+	_spawn_pickups()
+	destroyed.emit(self)
+	queue_free()
 
 func _spawn_pickups() -> void:
 	var world: WorldRoot = get_tree().get_first_node_in_group("world_root") as WorldRoot

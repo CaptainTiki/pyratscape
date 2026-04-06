@@ -1,36 +1,37 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene format=3 uid="uid://brjy85gjyak54"]
 
-[ext_resource type="Script" path="res://world/player/player_ship.gd" id="1"]
+[ext_resource type="Script" uid="uid://bxe2d43mganqy" path="res://world/player/player_ship.gd" id="1"]
+[ext_resource type="Script" uid="uid://joqfmg43dyq8" path="res://world/player/ship_movement.gd" id="2_movement"]
+[ext_resource type="Script" uid="uid://cw4ik4eubbm2x" path="res://world/player/weapon_system.gd" id="3_weapons"]
+[ext_resource type="Script" uid="uid://dgfkyotb5tetu" path="res://world/player/tractor_system.gd" id="4_tractor"]
+[ext_resource type="Script" uid="uid://doher1i15f5d0" path="res://world/player/hull_component.gd" id="5_hull"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.8
 height = 2.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.3, 0.85, 1, 1)
+
 [sub_resource type="BoxMesh" id="BoxMesh_body"]
 size = Vector3(1.2, 0.5, 2.8)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
-albedo_color = Color(0.3, 0.85, 1.0, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_wing"]
-size = Vector3(0.9, 0.12, 1.4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wing"]
 albedo_color = Color(0.18, 0.28, 0.45, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_engine"]
-size = Vector3(0.7, 0.2, 0.5)
+[sub_resource type="BoxMesh" id="BoxMesh_wing"]
+size = Vector3(0.9, 0.12, 1.4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_engine"]
 albedo_color = Color(0.1, 0.2, 0.25, 1)
 emission_enabled = true
-emission = Color(0.2, 0.8, 1.0, 1)
+emission = Color(0.2, 0.8, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_engine"]
+size = Vector3(0.7, 0.2, 0.5)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_tractor"]
 radius = 7.5
-
-[sub_resource type="BoxMesh" id="BoxMesh_tractor"]
-size = Vector3(0.12, 0.12, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tractor"]
 transparency = 1
@@ -38,54 +39,66 @@ albedo_color = Color(0.35, 0.95, 1, 0.45)
 emission_enabled = true
 emission = Color(0.25, 0.9, 1, 1)
 
-[node name="PlayerShip" type="CharacterBody3D"]
-script = ExtResource("1")
-collision_layer = 1
-collision_mask = 1
+[sub_resource type="BoxMesh" id="BoxMesh_tractor"]
+size = Vector3(0.12, 0.12, 1)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="PlayerShip" type="CharacterBody3D" unique_id=862648358]
+script = ExtResource("1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=488868441]
 shape = SubResource("CapsuleShape3D_player")
 
-[node name="Body" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_body")
+[node name="Body" type="MeshInstance3D" parent="." unique_id=2138893995]
 material_override = SubResource("StandardMaterial3D_body")
+mesh = SubResource("BoxMesh_body")
 
-[node name="WingLeft" type="MeshInstance3D" parent="."]
-position = Vector3(-1.1, 0, -0.15)
-mesh = SubResource("BoxMesh_wing")
+[node name="WingLeft" type="MeshInstance3D" parent="." unique_id=1890614668]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0, -0.15)
 material_override = SubResource("StandardMaterial3D_wing")
-
-[node name="WingRight" type="MeshInstance3D" parent="."]
-position = Vector3(1.1, 0, -0.15)
 mesh = SubResource("BoxMesh_wing")
-material_override = SubResource("StandardMaterial3D_wing")
 
-[node name="Engine" type="MeshInstance3D" parent="."]
-position = Vector3(0, 0, 1.5)
-mesh = SubResource("BoxMesh_engine")
+[node name="WingRight" type="MeshInstance3D" parent="." unique_id=1926500526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 0, -0.15)
+material_override = SubResource("StandardMaterial3D_wing")
+mesh = SubResource("BoxMesh_wing")
+
+[node name="Engine" type="MeshInstance3D" parent="." unique_id=1416908487]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.5)
 material_override = SubResource("StandardMaterial3D_engine")
+mesh = SubResource("BoxMesh_engine")
 
-[node name="MuzzleLeft" type="Node3D" parent="."]
-position = Vector3(-0.72, 0, -1.7)
+[node name="MuzzleLeft" type="Node3D" parent="." unique_id=1775005345]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.72, 0, -1.7)
 
-[node name="MuzzleRight" type="Node3D" parent="."]
-position = Vector3(0.72, 0, -1.7)
+[node name="MuzzleRight" type="Node3D" parent="." unique_id=114257050]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.72, 0, -1.7)
 
-[node name="MissileMuzzle" type="Node3D" parent="."]
-position = Vector3(0, 0, -1.95)
+[node name="MissileMuzzle" type="Node3D" parent="." unique_id=2098960458]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.95)
 
-[node name="TractorArea" type="Area3D" parent="."]
+[node name="TractorArea" type="Area3D" parent="." unique_id=968416872]
 collision_layer = 0
 collision_mask = 8
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TractorArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TractorArea" unique_id=747336928]
 shape = SubResource("SphereShape3D_tractor")
 
-
-[node name="TractorVisual" type="Node3D" parent="."]
+[node name="TractorVisual" type="Node3D" parent="." unique_id=165071629]
 visible = false
 
-[node name="Beam" type="MeshInstance3D" parent="TractorVisual"]
-position = Vector3(0, 0, -0.5)
-mesh = SubResource("BoxMesh_tractor")
+[node name="Beam" type="MeshInstance3D" parent="TractorVisual" unique_id=1873060875]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
 material_override = SubResource("StandardMaterial3D_tractor")
+mesh = SubResource("BoxMesh_tractor")
+
+[node name="ShipMovement" type="Node" parent="." unique_id=1575359459]
+script = ExtResource("2_movement")
+
+[node name="WeaponSystem" type="Node" parent="." unique_id=1745901102]
+script = ExtResource("3_weapons")
+
+[node name="TractorSystem" type="Node" parent="." unique_id=1586976018]
+script = ExtResource("4_tractor")
+
+[node name="HullComponent" type="Node" parent="." unique_id=1806979246]
+script = ExtResource("5_hull")

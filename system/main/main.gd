@@ -31,5 +31,5 @@ func redeploy_current_game() -> void:
 		start_game()
 		return
 	menu_manager.hide_current_menu()
-	game_root.world.redeploy_node()
+	game_root.world.redeploy_sector()
 	game_root.fade_from_black()

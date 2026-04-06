@@ -5,6 +5,9 @@
 [ext_resource type="Script" path="res://world/enemy_spawner.gd" id="3_espawn"]
 [ext_resource type="Script" path="res://world/activity_tracker.gd" id="4_activity"]
 [ext_resource type="Script" path="res://world/station_manager.gd" id="5_station"]
+[ext_resource type="Script" path="res://world/sector_controller.gd" id="6_sector"]
+[ext_resource type="Script" path="res://world/sector_spawner.gd" id="7_sspawn"]
+[ext_resource type="Script" path="res://world/sector_reporter.gd" id="8_sreport"]
 
 [sub_resource type="Environment" id="Environment_1"]
 background_mode = 2
@@ -139,3 +142,12 @@ script = ExtResource("4_activity")
 
 [node name="StationManager" type="Node" parent="."]
 script = ExtResource("5_station")
+
+[node name="SectorController" type="Node" parent="."]
+script = ExtResource("6_sector")
+
+[node name="SectorSpawner" type="Node" parent="SectorController"]
+script = ExtResource("7_sspawn")
+
+[node name="SectorReporter" type="Node" parent="SectorController"]
+script = ExtResource("8_sreport")

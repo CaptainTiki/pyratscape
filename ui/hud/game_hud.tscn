@@ -61,7 +61,7 @@ text = "Mission"
 layout_mode = 2
 text = "Up thrust  Double-tap Up boost  Down reverse  Left/Right turn  Q guns  W missiles  E tractor  F call/dock  Esc menu"
 
-[node name="NodeLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=115879245]
+[node name="SectorLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=115879245]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Node Status"
+text = "Sector Status"

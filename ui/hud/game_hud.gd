@@ -6,7 +6,7 @@ var world: WorldRoot = null
 @onready var hull_label: Label = %HullLabel
 @onready var resources_label: Label = %ResourcesLabel
 @onready var mission_label: Label = %MissionLabel
-@onready var node_label: Label = %NodeLabel
+@onready var sector_label: Label = %SectorLabel
 
 func bind_world(new_world: Node3D) -> void:
 	world = new_world as WorldRoot
@@ -21,40 +21,33 @@ func _refresh() -> void:
 	resources_label.text = "Scrap: %s\nCrystals: %s\nEnemies: %s\nAsteroids: %s\nActivity: %s" % [str(GameData.instance.scrap), str(GameData.instance.crystals), str(_get_enemy_count()), str(_get_asteroid_count()), str(_get_activity())]
 	if world != null:
 		mission_label.text = world.mission_message
-		node_label.text = _get_node_state_text()
-		# Hide HUD when docked — menus handle that state
-		visible = world.node_state != WorldRoot.NodeState.DOCKED
+		sector_label.text = _get_sector_state_text()
+		visible = world.sector_state != WorldRoot.SectorState.DOCKED
 
 func _get_enemy_count() -> int:
-	if world == null:
-		return 0
-	return world.enemies_remaining
+	return 0 if world == null else world.enemies_remaining
 
 func _get_asteroid_count() -> int:
-	if world == null:
-		return 0
-	return world.asteroids_remaining
+	return 0 if world == null else world.asteroids_remaining
 
 func _get_activity() -> int:
-	if world == null:
-		return 0
-	return world.get_activity_display()
+	return 0 if world == null else world.get_activity_display()
 
-func _get_node_state_text() -> String:
+func _get_sector_state_text() -> String:
 	if world == null:
-		return "Node Status: --"
-	match world.node_state:
-		WorldRoot.NodeState.DEPLOYING:
-			return "Node Status: Station deploying"
-		WorldRoot.NodeState.ACTIVE:
-			return "Node Status: Active field ops"
-		WorldRoot.NodeState.STATION_INBOUND:
-			return "Node Status: Station inbound"
-		WorldRoot.NodeState.DOCKING:
-			return "Node Status: Docking"
-		WorldRoot.NodeState.DOCKED:
-			return "Node Status: Docked"
-		WorldRoot.NodeState.REDEPLOYING:
-			return "Node Status: Redeploying"
+		return "Sector Status: --"
+	match world.sector_state:
+		WorldRoot.SectorState.DEPLOYING:
+			return "Sector Status: Station deploying"
+		WorldRoot.SectorState.ACTIVE:
+			return "Sector Status: Active field ops"
+		WorldRoot.SectorState.STATION_INBOUND:
+			return "Sector Status: Station inbound"
+		WorldRoot.SectorState.DOCKING:
+			return "Sector Status: Docking"
+		WorldRoot.SectorState.DOCKED:
+			return "Sector Status: Docked"
+		WorldRoot.SectorState.REDEPLOYING:
+			return "Sector Status: Redeploying"
 		_:
-			return "Node Status: Unknown"
+			return "Sector Status: Unknown"

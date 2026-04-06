@@ -6,7 +6,6 @@ static var instance : MenuManager
 var menus : Dictionary[Menu.Type, Menu] = {}
 var current_menu: Menu = null
 
-
 func _ready() -> void:
 	instance = self
 	init_menus()
@@ -29,7 +28,7 @@ func set_menu_data() -> void:
 func init_menus() -> void:
 	_add_menu(Menu.Type.MAIN, Prefabs.main_menu_scene)
 	_add_menu(Menu.Type.STATION, Prefabs.station_menu_scene)
-	_add_menu(Menu.Type.NODE_MAP, Prefabs.node_map_menu_scene)
+	_add_menu(Menu.Type.SECTOR_MAP, Prefabs.sector_map_menu_scene)
 
 func _add_menu(type: Menu.Type, scene: PackedScene) -> void:
 	var menu: Menu = scene.instantiate()

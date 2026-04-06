@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find /d/Godot/REPOs/pyratscape -type f -name *map* -o -name *Map*)"
+      "Bash(xargs wc:*)",
+      "Bash(find /c/Repo/pyratscape -type d -not -path */.*)"
     ]
   }
 }

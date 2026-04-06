@@ -114,19 +114,19 @@ layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="NodeMapButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer/ButtonRow"]
+[node name="SectorMapButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer/ButtonRow"]
 custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
-text = "Node Map"
+text = "Sector Map"
 
 [node name="RedeployButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer/ButtonRow"]
 custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
-text = "Redeploy Node"
+text = "Redeploy Sector"
 
 [connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/UpgradeDamageButton" to="." method="_on_upgrade_damage_button_pressed"]
 [connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/UpgradeRateButton" to="." method="_on_upgrade_rate_button_pressed"]
 [connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/UpgradeHullButton" to="." method="_on_upgrade_hull_button_pressed"]
 [connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/UpgradeMiningButton" to="." method="_on_upgrade_mining_button_pressed"]
-[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ButtonRow/NodeMapButton" to="." method="_on_node_map_button_pressed"]
+[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ButtonRow/SectorMapButton" to="." method="_on_sector_map_button_pressed"]
 [connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ButtonRow/RedeployButton" to="." method="_on_redeploy_button_pressed"]
