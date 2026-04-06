@@ -5,14 +5,28 @@ signal destroyed(enemy: EnemyShip)
 
 const PROJECTILE_SCENE: PackedScene = preload("res://world/combat/projectile.tscn")
 
-@export var move_speed: float = 13.0
-@export var fire_cooldown: float = 1.0
-@export var projectile_damage: float = 8.0
+@export_group("Movement")
+@export var move_speed: float = 10.0
+@export var turn_speed: float = 3.0
 @export var preferred_range: float = 12.0
+@export var preferred_range_variance: float = 2.0
+
+@export_group("Combat")
+@export var fire_cooldown: float = 1.4
+@export var projectile_damage: float = 5.0
+@export var engage_range: float = 18.0
+
+@export_group("Engagement")
+@export var engage_delay_min: float = 0.5
+@export var engage_delay_max: float = 1.5
 
 var target: PlayerShip = null
+var _engage_delay: float = 0.0
+var _body_material: StandardMaterial3D = null
+var _base_color: Color = Color(0.95, 0.33, 0.25, 1.0)
 
 @onready var muzzle: Node3D = $Muzzle
+@onready var _body_mesh: MeshInstance3D = $Body
 @onready var _health: HealthComponent = $HealthComponent
 @onready var _collision_handler: CollisionDamageHandler = $CollisionDamageHandler
 
@@ -31,12 +45,23 @@ func _ready() -> void:
 	_station_attack_timer.one_shot = true
 	add_child(_station_attack_timer)
 	_station_attack_timer.start(1.2)
+	preferred_range += randf_range(-preferred_range_variance, preferred_range_variance)
+	_engage_delay = randf_range(engage_delay_min, engage_delay_max)
+	_body_material = _body_mesh.material_override.duplicate() as StandardMaterial3D
+	_body_mesh.material_override = _body_material
+	_health.damaged.connect(_on_damaged)
 
 func _physics_process(delta: float) -> void:
 	var world: WorldRoot = get_tree().get_first_node_in_group("world_root") as WorldRoot
 	if target == null or not is_instance_valid(target):
 		velocity = Vector3.ZERO
 		move_and_slide()
+		return
+	if _engage_delay > 0.0:
+		_engage_delay -= delta
+		velocity = Vector3.ZERO
+		move_and_slide()
+		global_position.y = 1.25
 		return
 	var to_target: Vector3 = target.global_position - global_position
 	to_target.y = 0.0
@@ -48,7 +73,7 @@ func _physics_process(delta: float) -> void:
 		move_direction = -to_target.normalized()
 	velocity = move_direction * move_speed
 	if to_target.length() > 0.01:
-		basis = basis.slerp(Basis.looking_at(to_target.normalized(), Vector3.UP), 6.0 * delta)
+		basis = basis.slerp(Basis.looking_at(to_target.normalized(), Vector3.UP), turn_speed * delta)
 	move_and_slide()
 	global_position.y = 1.25
 	_collision_handler.tick(self, delta)
@@ -57,7 +82,7 @@ func _physics_process(delta: float) -> void:
 		if station_distance <= 6.0 and _station_attack_timer.is_stopped():
 			world.sector_controller.apply_station_damage(6)
 			_station_attack_timer.start(1.2)
-	if distance <= 18.0:
+	if distance <= engage_range:
 		_try_fire()
 
 func _on_collision_hit(damage: int) -> void:
@@ -76,10 +101,39 @@ func _try_fire() -> void:
 	projectile.source = self
 	projectile_parent.add_child(projectile)
 
+func _on_damaged() -> void:
+	if _body_material == null:
+		return
+	_body_material.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+	var tween := create_tween()
+	tween.tween_property(_body_material, "albedo_color", _base_color, 0.15)
+
 func _on_health_depleted() -> void:
+	_spawn_explosion()
 	_spawn_pickups()
 	destroyed.emit(self)
 	queue_free()
+
+func _spawn_explosion() -> void:
+	var sphere := MeshInstance3D.new()
+	var mesh := SphereMesh.new()
+	mesh.radius = 0.6
+	mesh.height = 1.2
+	sphere.mesh = mesh
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(1.0, 0.5, 0.1, 0.8)
+	mat.emission_enabled = true
+	mat.emission = Color(1.0, 0.3, 0.0)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	sphere.material_override = mat
+	sphere.global_position = global_position
+	get_tree().root.add_child(sphere)
+	var tween := sphere.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(sphere, "scale", Vector3(4.0, 4.0, 4.0), 0.35)
+	tween.tween_property(mat, "albedo_color:a", 0.0, 0.35)
+	tween.set_parallel(false)
+	tween.tween_callback(sphere.queue_free)
 
 func _spawn_pickups() -> void:
 	var world: WorldRoot = get_tree().get_first_node_in_group("world_root") as WorldRoot

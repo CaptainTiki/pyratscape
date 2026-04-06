@@ -6,13 +6,19 @@ signal wave_spawned
 
 const ENEMY_SCENE: PackedScene = preload("res://world/enemies/enemy_ship.tscn")
 
+@export_group("Timing")
+@export var start_delay: float = 5.0
 @export var spawn_interval_base: float = 4.5
-@export var spawn_interval_activity_scale: float = 0.08
-@export var spawn_interval_min: float = 0.8
+@export var spawn_interval_activity_scale: float = 0.04
+@export var spawn_interval_min: float = 2.0
+
+@export_group("Wave Size")
 @export var activity_per_extra_slot: float = 18.0
-@export var live_cap_max: int = 8
-@export var activity_per_wave_size: float = 28.0
+@export var live_cap_max: int = 6
+@export var activity_per_wave_size: float = 42.0
 @export var wave_size_max: int = 3
+
+@export_group("Spawn Position")
 @export var spawn_distance_min: float = 24.0
 @export var spawn_distance_max: float = 34.0
 
@@ -36,7 +42,7 @@ func _ready() -> void:
 
 func start_spawning() -> void:
 	spawning_active = true
-	_spawn_timer.start(3.5)
+	_spawn_timer.start(start_delay)
 
 func stop_spawning() -> void:
 	spawning_active = false

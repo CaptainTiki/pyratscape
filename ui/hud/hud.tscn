@@ -1,0 +1,229 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/hud/hud.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="SBF_panel"]
+bg_color = Color(0.05, 0.05, 0.1, 0.72)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.5, 0.7, 0.4)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SBF_bar_bg"]
+bg_color = Color(0.08, 0.08, 0.12, 0.9)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="SBF_hull"]
+bg_color = Color(0.85, 0.18, 0.12, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="SBF_power"]
+bg_color = Color(0.18, 0.52, 0.95, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="SBF_cargo"]
+bg_color = Color(0.92, 0.76, 0.12, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="SBF_scrap"]
+bg_color = Color(0.9, 0.62, 0.08, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="SBF_crystal"]
+bg_color = Color(0.08, 0.82, 0.95, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="SBF_other"]
+bg_color = Color(0.28, 0.82, 0.32, 0.45)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="HUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="ShipPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 185.0
+offset_bottom = 108.0
+theme_override_styles/panel = SubResource("SBF_panel")
+
+[node name="ShipMargin" type="MarginContainer" parent="ShipPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 7
+
+[node name="ShipVBox" type="VBoxContainer" parent="ShipPanel/ShipMargin"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="HullBar" type="ProgressBar" parent="ShipPanel/ShipMargin/ShipVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 14)
+value = 100.0
+show_percentage = false
+theme_override_styles/fill = SubResource("SBF_hull")
+theme_override_styles/background = SubResource("SBF_bar_bg")
+
+[node name="PowerBar" type="ProgressBar" parent="ShipPanel/ShipMargin/ShipVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 14)
+value = 100.0
+show_percentage = false
+theme_override_styles/fill = SubResource("SBF_power")
+theme_override_styles/background = SubResource("SBF_bar_bg")
+
+[node name="CargoBar" type="ProgressBar" parent="ShipPanel/ShipMargin/ShipVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 14)
+max_value = 50.0
+value = 0.0
+show_percentage = false
+theme_override_styles/fill = SubResource("SBF_cargo")
+theme_override_styles/background = SubResource("SBF_bar_bg")
+
+[node name="MissileLabel" type="Label" parent="ShipPanel/ShipMargin/ShipVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "MSSL  --"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="StationPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+grow_horizontal = 0
+offset_left = -193.0
+offset_right = -8.0
+offset_top = 8.0
+offset_bottom = 122.0
+theme_override_styles/panel = SubResource("SBF_panel")
+
+[node name="StationMargin" type="MarginContainer" parent="StationPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 7
+
+[node name="StationVBox" type="VBoxContainer" parent="StationPanel/StationMargin"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="StationStatusLabel" type="Label" parent="StationPanel/StationMargin/StationVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "STA  --"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="DockingLabel" type="Label" parent="StationPanel/StationMargin/StationVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "DOCK  --"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="ScrapBar" type="ProgressBar" parent="StationPanel/StationMargin/StationVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 10)
+max_value = 100.0
+value = 0.0
+show_percentage = false
+theme_override_styles/fill = SubResource("SBF_scrap")
+theme_override_styles/background = SubResource("SBF_bar_bg")
+
+[node name="CrystalBar" type="ProgressBar" parent="StationPanel/StationMargin/StationVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 10)
+max_value = 100.0
+value = 0.0
+show_percentage = false
+theme_override_styles/fill = SubResource("SBF_crystal")
+theme_override_styles/background = SubResource("SBF_bar_bg")
+
+[node name="OtherBar" type="ProgressBar" parent="StationPanel/StationMargin/StationVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 10)
+max_value = 100.0
+value = 0.0
+show_percentage = false
+theme_override_styles/fill = SubResource("SBF_other")
+theme_override_styles/background = SubResource("SBF_bar_bg")
+
+[node name="MinimapPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+offset_left = -168.0
+offset_right = -8.0
+offset_top = -168.0
+offset_bottom = -8.0
+theme_override_styles/panel = SubResource("SBF_panel")
+
+[node name="MinimapLabel" type="Label" parent="MinimapPanel"]
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "MINIMAP"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 10
+modulate = Color(0.4, 0.5, 0.6, 0.7)
+
+[node name="DamageFlash" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.8, 0.0, 0.0, 0.0)
+mouse_filter = 2

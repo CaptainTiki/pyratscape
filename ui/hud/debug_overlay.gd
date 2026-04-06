@@ -1,5 +1,5 @@
 extends Control
-class_name GameHud
+class_name DebugOverlay
 
 var world: WorldRoot = null
 
@@ -22,7 +22,6 @@ func _refresh() -> void:
 	if world != null:
 		mission_label.text = world.sector_controller.mission_message
 		sector_label.text = _get_sector_state_text()
-		visible = world.sector_controller.sector_state != SectorController.SectorState.DOCKED
 
 func _get_enemy_count() -> int:
 	return 0 if world == null else world.sector_controller.enemies_remaining

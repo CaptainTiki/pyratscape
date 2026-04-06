@@ -2,13 +2,21 @@ extends Node3D
 class_name GameRoot
 
 @onready var world: WorldRoot = $World
-@onready var hud: GameHud = $CanvasLayer/GameHUD
+@onready var hud: Hud = $CanvasLayer/HUD
+@onready var debug_overlay: DebugOverlay = $CanvasLayer/DebugOverlay
 @onready var fade_rect: ColorRect = $CanvasLayer/FadeRect
 
 func _ready() -> void:
 	hud.bind_world(world)
+	debug_overlay.bind_world(world)
 	world.sector_controller.dock_sequence_finished.connect(_on_world_dock_sequence_finished)
 	fade_rect.modulate.a = 0.0
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F3:
+			debug_overlay.visible = !debug_overlay.visible
+			get_viewport().set_input_as_handled()
 
 func toggle_pause() -> void:
 	var main: Main = get_tree().current_scene as Main
