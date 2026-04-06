@@ -4,6 +4,12 @@ class_name ActivityTracker
 signal activity_changed
 signal run_completed
 
+@export var base_rate_multiplier: float = 0.5
+@export var danger_rate_scale: float = 1.5
+@export var base_activity_rate: float = 0.55
+@export var activity_time_scale: float = 0.055
+@export var win_activity_threshold: float = 35.0
+
 var activity: float = 0.0
 var time_in_node: float = 0.0
 var danger_level: float = 0.3
@@ -14,8 +20,8 @@ func _process(delta: float) -> void:
 	if not tracking_active:
 		return
 	time_in_node += delta
-	var rate_multiplier: float = 0.5 + (danger_level * 1.5)
-	activity += (0.55 + (time_in_node * 0.055)) * rate_multiplier * delta
+	var rate_multiplier: float = base_rate_multiplier + (danger_level * danger_rate_scale)
+	activity += (base_activity_rate + (time_in_node * activity_time_scale)) * rate_multiplier * delta
 	activity_changed.emit()
 
 func start_tracking() -> void:
@@ -38,7 +44,7 @@ func add_activity(amount: float) -> void:
 func check_win_condition(enemies_remaining: int) -> void:
 	if run_complete:
 		return
-	if enemies_remaining <= 0 and activity >= 35.0:
+	if enemies_remaining <= 0 and activity >= win_activity_threshold:
 		run_complete = true
 		run_completed.emit()
 

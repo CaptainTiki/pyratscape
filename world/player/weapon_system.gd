@@ -15,31 +15,37 @@ var muzzle_left: Node3D = null
 var muzzle_right: Node3D = null
 var missile_muzzle: Node3D = null
 
-var fire_timer: float = 0.0
-var secondary_fire_timer: float = 0.0
+var _fire_timer: Timer
+var _secondary_timer: Timer
 
-func tick(delta: float) -> void:
-	fire_timer = maxf(0.0, fire_timer - delta)
-	secondary_fire_timer = maxf(0.0, secondary_fire_timer - delta)
+func _ready() -> void:
+	_fire_timer = Timer.new()
+	_fire_timer.one_shot = true
+	add_child(_fire_timer)
+	_secondary_timer = Timer.new()
+	_secondary_timer.one_shot = true
+	add_child(_secondary_timer)
+
+func tick(_delta: float) -> void:
 	_handle_fire()
 	_handle_secondary_fire()
 
 func _handle_fire() -> void:
 	if not Input.is_action_pressed("fire_primary"):
 		return
-	if fire_timer > 0.0 or projectile_parent == null:
+	if not _fire_timer.is_stopped() or projectile_parent == null:
 		return
 
-	fire_timer = fire_cooldown
+	_fire_timer.start(fire_cooldown)
 	_spawn_projectile(muzzle_left.global_position, -source.global_basis.z, projectile_damage, 48.0, 0.2)
 	_spawn_projectile(muzzle_right.global_position, -source.global_basis.z, projectile_damage, 48.0, 0.2)
 
 func _handle_secondary_fire() -> void:
 	if not Input.is_action_pressed("fire_secondary"):
 		return
-	if secondary_fire_timer > 0.0 or projectile_parent == null:
+	if not _secondary_timer.is_stopped() or projectile_parent == null:
 		return
-	secondary_fire_timer = secondary_cooldown
+	_secondary_timer.start(secondary_cooldown)
 	_spawn_projectile(missile_muzzle.global_position, -source.global_basis.z, missile_damage, 26.0, 0.4)
 
 func _spawn_projectile(spawn_position: Vector3, shot_direction: Vector3, damage: float, speed: float, proj_scale: float) -> void:

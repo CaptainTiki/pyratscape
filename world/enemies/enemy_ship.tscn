@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://world/enemies/enemy_ship.gd" id="1"]
 [ext_resource type="Script" path="res://world/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://world/collision_damage_handler.gd" id="3_collision"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enemy"]
 radius = 0.75
@@ -47,3 +48,6 @@ position = Vector3(0, 0, -1.5)
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("2_health")
 max_health = 34
+
+[node name="CollisionDamageHandler" type="Node" parent="."]
+script = ExtResource("3_collision")

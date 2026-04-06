@@ -18,10 +18,18 @@ func start_game() -> void:
 	menu_manager.hide_current_menu()
 
 func return_to_main_menu() -> void:
+	get_tree().paused = false
 	menu_manager.show_menu(Menu.Type.MAIN)
 	if game_root != null:
 		game_root.queue_free()
 		game_root = null
+
+func show_pause_menu() -> void:
+	menu_manager.show_menu(Menu.Type.PAUSE)
+
+func resume_from_pause() -> void:
+	get_tree().paused = false
+	menu_manager.hide_current_menu()
 
 func show_station_menu() -> void:
 	menu_manager.show_menu(Menu.Type.STATION)
@@ -31,5 +39,5 @@ func redeploy_current_game() -> void:
 		start_game()
 		return
 	menu_manager.hide_current_menu()
-	game_root.world.redeploy_sector()
+	game_root.world.sector_controller.redeploy_sector()
 	game_root.fade_from_black()

@@ -47,8 +47,8 @@ func _apply_upgrades() -> void:
 	var main: Main = get_tree().current_scene as Main
 	if main != null and main.game_root != null:
 		var world: WorldRoot = main.game_root.world
-		if world != null and world.player != null and is_instance_valid(world.player):
-			world.player._sync_from_game_data()
+		if world != null and world.sector_controller.player != null and is_instance_valid(world.sector_controller.player):
+			world.sector_controller.player._sync_from_game_data()
 	_refresh()
 
 func _on_sector_map_button_pressed() -> void:

@@ -22,7 +22,7 @@ func _ready() -> void:
 	health = hull_component
 	hull_component.destroyed.connect(_on_hull_destroyed)
 	movement.ship = self
-	movement.hull_component = hull_component
+	movement.collision_handler = $CollisionDamageHandler
 	weapons.source = self
 	weapons.projectile_parent = projectile_parent
 	weapons.muzzle_left = muzzle_left
@@ -43,11 +43,11 @@ func _physics_process(delta: float) -> void:
 	weapons.tick(delta)
 	tractor.tick(delta)
 	if Input.is_action_just_pressed("interact") and world != null:
-		world.try_interact_at_station()
+		world.sector_controller.try_interact_at_station()
 
 func _on_hull_destroyed() -> void:
 	if world != null:
-		world.mission_message = "Your ship was destroyed. Return with Esc and try again."
+		world.sector_controller.mission_message = "Your ship was destroyed. Return with Esc and try again."
 		world.world_state_changed.emit()
 	queue_free()
 

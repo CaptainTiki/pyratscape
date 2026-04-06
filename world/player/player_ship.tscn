@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://cw4ik4eubbm2x" path="res://world/player/weapon_system.gd" id="3_weapons"]
 [ext_resource type="Script" uid="uid://dgfkyotb5tetu" path="res://world/player/tractor_system.gd" id="4_tractor"]
 [ext_resource type="Script" uid="uid://doher1i15f5d0" path="res://world/player/hull_component.gd" id="5_hull"]
+[ext_resource type="Script" path="res://world/collision_damage_handler.gd" id="6_collision"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.8
@@ -102,3 +103,8 @@ script = ExtResource("4_tractor")
 
 [node name="HullComponent" type="Node" parent="." unique_id=1806979246]
 script = ExtResource("5_hull")
+
+[node name="CollisionDamageHandler" type="Node" parent="."]
+script = ExtResource("6_collision")
+damage_scale = 0.42
+min_impact_speed = 6.0

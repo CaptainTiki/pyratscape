@@ -7,8 +7,15 @@ class_name GameRoot
 
 func _ready() -> void:
 	hud.bind_world(world)
-	world.dock_sequence_finished.connect(_on_world_dock_sequence_finished)
+	world.sector_controller.dock_sequence_finished.connect(_on_world_dock_sequence_finished)
 	fade_rect.modulate.a = 0.0
+
+func toggle_pause() -> void:
+	var main: Main = get_tree().current_scene as Main
+	if main == null:
+		return
+	get_tree().paused = true
+	main.show_pause_menu()
 
 func return_to_menu() -> void:
 	var main: Main = get_tree().current_scene as Main

@@ -8,6 +8,7 @@ var current_menu: Menu = null
 
 func _ready() -> void:
 	instance = self
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	init_menus()
 
 func show_menu(menu_type: Menu.Type) -> void:
@@ -29,6 +30,7 @@ func init_menus() -> void:
 	_add_menu(Menu.Type.MAIN, Prefabs.main_menu_scene)
 	_add_menu(Menu.Type.STATION, Prefabs.station_menu_scene)
 	_add_menu(Menu.Type.SECTOR_MAP, Prefabs.sector_map_menu_scene)
+	_add_menu(Menu.Type.PAUSE, Prefabs.pause_menu_scene)
 
 func _add_menu(type: Menu.Type, scene: PackedScene) -> void:
 	var menu: Menu = scene.instantiate()

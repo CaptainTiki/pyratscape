@@ -60,7 +60,7 @@ func _collect() -> void:
 func _on_body_entered(body: Node) -> void:
 	if body is PlayerShip:
 		var player: PlayerShip = body as PlayerShip
-		if player.is_tractor_active():
+		if player.tractor.tractor_active:
 			_collect()
 		else:
 			repel_from(player)

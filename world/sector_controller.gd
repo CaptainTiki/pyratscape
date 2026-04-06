@@ -4,6 +4,15 @@ class_name SectorController
 signal sector_changed
 signal dock_sequence_finished
 
+enum SectorState {
+	DEPLOYING,
+	ACTIVE,
+	STATION_INBOUND,
+	DOCKING,
+	DOCKED,
+	REDEPLOYING
+}
+
 @onready var spawner: SectorSpawner = $SectorSpawner
 @onready var reporter: SectorReporter = $SectorReporter
 
@@ -11,7 +20,7 @@ var station_manager: StationManager = null
 var enemy_spawner: EnemySpawner = null
 var activity_tracker: ActivityTracker = null
 
-var sector_state: int = WorldRoot.SectorState.DEPLOYING
+var sector_state: int = SectorController.SectorState.DEPLOYING
 var target_asteroid_count: int = 7
 
 var player: PlayerShip:
@@ -37,29 +46,20 @@ func setup(world: WorldRoot) -> void:
 	reporter.activity_tracker = activity_tracker
 	spawner.setup(world)
 
-	if not station_manager.deploy_finished.is_connected(on_station_deploy_finished):
-		station_manager.deploy_finished.connect(on_station_deploy_finished)
-	if not station_manager.inbound_finished.is_connected(on_station_inbound_finished):
-		station_manager.inbound_finished.connect(on_station_inbound_finished)
-	if not station_manager.dock_finished.is_connected(on_station_dock_finished):
-		station_manager.dock_finished.connect(on_station_dock_finished)
-	if not station_manager.redeploy_finished.is_connected(on_station_redeploy_finished):
-		station_manager.redeploy_finished.connect(on_station_redeploy_finished)
-	if not enemy_spawner.enemy_destroyed.is_connected(on_enemy_destroyed):
-		enemy_spawner.enemy_destroyed.connect(on_enemy_destroyed)
-	if not enemy_spawner.wave_spawned.is_connected(on_wave_spawned):
-		enemy_spawner.wave_spawned.connect(on_wave_spawned)
-	if not activity_tracker.activity_changed.is_connected(on_activity_changed):
-		activity_tracker.activity_changed.connect(on_activity_changed)
-	if not activity_tracker.run_completed.is_connected(on_run_completed):
-		activity_tracker.run_completed.connect(on_run_completed)
-	if not spawner.asteroid_mined_out.is_connected(on_asteroid_mined_out):
-		spawner.asteroid_mined_out.connect(on_asteroid_mined_out)
+	station_manager.deploy_finished.connect(on_station_deploy_finished)
+	station_manager.inbound_finished.connect(on_station_inbound_finished)
+	station_manager.dock_finished.connect(on_station_dock_finished)
+	station_manager.redeploy_finished.connect(on_station_redeploy_finished)
+	enemy_spawner.enemy_destroyed.connect(on_enemy_destroyed)
+	enemy_spawner.wave_spawned.connect(on_wave_spawned)
+	activity_tracker.activity_changed.connect(on_activity_changed)
+	activity_tracker.run_completed.connect(on_run_completed)
+	spawner.asteroid_mined_out.connect(on_asteroid_mined_out)
 
 func begin_sector_cycle() -> void:
 	spawner.clear()
 	_read_sector_params()
-	sector_state = WorldRoot.SectorState.DEPLOYING
+	sector_state = SectorController.SectorState.DEPLOYING
 	reporter.deploying()
 	station_manager.begin_deploy()
 	spawner.spawn_asteroids(target_asteroid_count)
@@ -69,7 +69,7 @@ func redeploy_sector() -> void:
 	begin_sector_cycle()
 
 func try_interact_at_station() -> bool:
-	if sector_state in [WorldRoot.SectorState.DOCKING, WorldRoot.SectorState.DOCKED]:
+	if sector_state in [SectorController.SectorState.DOCKING, SectorController.SectorState.DOCKED]:
 		return true
 	if not station_manager.station_present:
 		call_station_to_sector()
@@ -81,7 +81,7 @@ func try_interact_at_station() -> bool:
 	if GameData.instance == null:
 		return false
 	GameData.instance.repair_player_full()
-	sector_state = WorldRoot.SectorState.DOCKING
+	sector_state = SectorController.SectorState.DOCKING
 	station_manager.begin_dock()
 	reporter.docking()
 	if spawner.player != null and is_instance_valid(spawner.player):
@@ -93,9 +93,9 @@ func try_interact_at_station() -> bool:
 	return true
 
 func call_station_to_sector() -> void:
-	if station_manager.station_present or sector_state in [WorldRoot.SectorState.STATION_INBOUND, WorldRoot.SectorState.DOCKING, WorldRoot.SectorState.DOCKED]:
+	if station_manager.station_present or sector_state in [SectorController.SectorState.STATION_INBOUND, SectorController.SectorState.DOCKING, SectorController.SectorState.DOCKED]:
 		return
-	sector_state = WorldRoot.SectorState.STATION_INBOUND
+	sector_state = SectorController.SectorState.STATION_INBOUND
 	station_manager.begin_inbound()
 	reporter.station_inbound()
 	sector_changed.emit()
@@ -116,7 +116,7 @@ func get_activity_display() -> int:
 
 func on_station_deploy_finished() -> void:
 	spawner.spawn_player()
-	sector_state = WorldRoot.SectorState.ACTIVE
+	sector_state = SectorController.SectorState.ACTIVE
 	station_manager.depart_after_launch()
 	enemy_spawner.start_spawning()
 	activity_tracker.start_tracking()
@@ -124,18 +124,18 @@ func on_station_deploy_finished() -> void:
 	sector_changed.emit()
 
 func on_station_inbound_finished() -> void:
-	sector_state = WorldRoot.SectorState.ACTIVE
+	sector_state = SectorController.SectorState.ACTIVE
 	reporter.station_on_site()
 	sector_changed.emit()
 
 func on_station_dock_finished() -> void:
-	sector_state = WorldRoot.SectorState.DOCKED
+	sector_state = SectorController.SectorState.DOCKED
 	reporter.dock_complete()
 	sector_changed.emit()
 	dock_sequence_finished.emit()
 
 func on_station_redeploy_finished() -> void:
-	sector_state = WorldRoot.SectorState.ACTIVE
+	sector_state = SectorController.SectorState.ACTIVE
 	reporter.redeploy_complete()
 	sector_changed.emit()
 
