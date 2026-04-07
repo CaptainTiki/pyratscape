@@ -39,11 +39,11 @@ func _on_world_dock_sequence_finished() -> void:
 	fade_rect.show()
 	var tween: Tween = create_tween()
 	tween.tween_property(fade_rect, "modulate:a", 1.0, 0.4)
-	tween.finished.connect(_show_station_menu)
+	tween.finished.connect(_show_docking_bay_menu)
 
-func _show_station_menu() -> void:
+func _show_docking_bay_menu() -> void:
 	var main: Main = get_tree().current_scene as Main
 	if main != null:
-		main.show_station_menu()
+		main.show_docking_bay_menu()
 	# Don't fade from black — menus have their own dark background.
 	# FadeRect stays opaque so the game world is hidden behind menus.

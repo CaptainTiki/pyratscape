@@ -28,6 +28,7 @@ func set_menu_data() -> void:
 
 func init_menus() -> void:
 	_add_menu(Menu.Type.MAIN, Prefabs.main_menu_scene)
+	_add_menu(Menu.Type.DOCKING_BAY, Prefabs.docking_bay_menu_scene)
 	_add_menu(Menu.Type.STATION, Prefabs.station_menu_scene)
 	_add_menu(Menu.Type.SECTOR_MAP, Prefabs.sector_map_menu_scene)
 	_add_menu(Menu.Type.PAUSE, Prefabs.pause_menu_scene)

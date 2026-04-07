@@ -1,0 +1,160 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/menus/docking_bay_menu/docking_bay_menu.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.06, 0.09, 0.16, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.6, 0.9, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 24
+
+[node name="DockingBayMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.03, 0.06, 0.95)
+
+[node name="CenterPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -290.0
+offset_top = -190.0
+offset_right = 290.0
+offset_bottom = 190.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "DOCKING BAY"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+
+[node name="Separator1" type="HSeparator" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Bay1Row" type="HBoxContainer" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BayLabel" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer/Bay1Row"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "BAY 1"
+
+[node name="ShipLabel" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer/Bay1Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "FIGHTER"
+
+[node name="DeployButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer/Bay1Row"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "DEPLOY"
+
+[node name="Bay1HealthLabel" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer/Bay1Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+text = "HP  100 / 100"
+horizontal_alignment = 2
+
+[node name="Separator2" type="HSeparator" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Bay2Row" type="HBoxContainer" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BayLabel" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer/Bay2Row"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "BAY 2"
+
+[node name="ShipLabel" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer/Bay2Row"]
+layout_mode = 2
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "--  EMPTY  --"
+
+[node name="Separator3" type="HSeparator" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Bay3Row" type="HBoxContainer" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BayLabel" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer/Bay3Row"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "BAY 3"
+
+[node name="ShipLabel" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer/Bay3Row"]
+layout_mode = 2
+modulate = Color(0.5, 0.5, 0.5, 1)
+text = "--  EMPTY  --"
+
+[node name="Separator4" type="HSeparator" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="JumpRow" type="HBoxContainer" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="ActivateJumpButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer/JumpRow"]
+custom_minimum_size = Vector2(160, 40)
+layout_mode = 2
+text = "ACTIVATE JUMP"
+
+[node name="Separator5" type="HSeparator" parent="CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ResearchLabel" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RESEARCH    --"
+
+[node name="ProductionLabel" type="Label" parent="CenterPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PRODUCTION  --"
+
+[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/Bay1Row/DeployButton" to="." method="_on_deploy_bay1_pressed"]
+[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/JumpRow/ActivateJumpButton" to="." method="_on_activate_jump_pressed"]

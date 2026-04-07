@@ -31,6 +31,9 @@ func resume_from_pause() -> void:
 	get_tree().paused = false
 	menu_manager.hide_current_menu()
 
+func show_docking_bay_menu() -> void:
+	menu_manager.show_menu(Menu.Type.DOCKING_BAY)
+
 func show_station_menu() -> void:
 	menu_manager.show_menu(Menu.Type.STATION)
 
