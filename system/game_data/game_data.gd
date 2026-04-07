@@ -6,7 +6,8 @@ static var instance: GameData
 var scrap: int = 0
 var crystals: int = 0
 var station_integrity: int = 100
-var player_max_hull: int = 100
+var player_ship_max_hull: int = 100  # permanent value; only changed by upgrades
+var player_max_hull: int = 100       # operational value; temporarily lowered in pod mode
 var player_hull: int = 100
 var player_damage: float = 12.0
 var player_fire_rate: float = 0.22
@@ -24,6 +25,7 @@ func reset_for_new_game() -> void:
 	scrap = 0
 	crystals = 0
 	station_integrity = 100
+	player_ship_max_hull = 100
 	player_max_hull = 100
 	player_hull = player_max_hull
 	player_damage = 12.0
@@ -38,6 +40,10 @@ func reset_for_new_game() -> void:
 
 func repair_player_full() -> void:
 	player_hull = player_max_hull
+
+func restore_ship_hull() -> void:
+	player_max_hull = player_ship_max_hull
+	player_hull = player_ship_max_hull
 
 func add_scrap(amount: int) -> void:
 	scrap += amount
@@ -73,6 +79,7 @@ func buy_hull_upgrade() -> bool:
 	var cost_scrap: int = 18 + cleared_runs * 4
 	if not spend(cost_scrap, 0):
 		return false
+	player_ship_max_hull += 12
 	player_max_hull += 12
 	player_hull = player_max_hull
 	return true

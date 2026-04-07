@@ -39,6 +39,8 @@ func clear() -> void:
 	enemy_spawner.player = null
 
 func spawn_player() -> void:
+	if GameData.instance != null:
+		GameData.instance.restore_ship_hull()
 	player = PLAYER_SCENE.instantiate() as PlayerShip
 	player.global_position = station_anchor.global_position + Vector3(0.0, 0.25, 8.0)
 	player.projectile_parent = projectile_layer
