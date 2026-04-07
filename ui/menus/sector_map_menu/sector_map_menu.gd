@@ -34,7 +34,12 @@ func _on_sector_map_sector_selected(sector_id: int) -> void:
 		danger_text = "High"
 	elif sector.danger_level > 0.3:
 		danger_text = "Medium"
-	var info: String = "Fleet: %d ships  |  Asteroids: %d  |  Danger: %s" % [sector.enemy_fleet_size, sector.asteroid_count, danger_text]
+
+	var enemy_count: int = 0
+	if GameData.instance != null and GameData.instance.enemy_forces != null:
+		enemy_count = GameData.instance.enemy_forces.get_enemies_in_sector(sector_id)
+
+	var info: String = "Fleet: %d ships  |  Asteroids: %d  |  Danger: %s" % [enemy_count, sector.asteroid_count, danger_text]
 	if sector.has_poi:
 		info += "  |  POI detected"
 	if sector_info_label != null:

@@ -17,6 +17,7 @@ var player_mining_damage: float = 18.0
 var player_tractor_range: float = 7.5
 var cleared_runs: int = 0
 var sector_map: SectorMapData = null
+var enemy_forces: EnemyForces = null
 
 func _ready() -> void:
 	instance = self
@@ -37,6 +38,8 @@ func reset_for_new_game() -> void:
 	cleared_runs = 0
 	sector_map = SectorMapData.new()
 	sector_map.generate()
+	enemy_forces = EnemyForces.new()
+	enemy_forces.initialize_sectors(sector_map.sectors.size(), 1800)
 
 func repair_player_full() -> void:
 	player_hull = player_max_hull

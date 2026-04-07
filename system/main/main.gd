@@ -42,5 +42,20 @@ func redeploy_current_game() -> void:
 		start_game()
 		return
 	menu_manager.hide_current_menu()
+
+	# Check if we're actually changing sectors
+	var old_sector_id = -1
+	var new_sector_id = -1
+	if GameData.instance != null and GameData.instance.sector_map != null:
+		old_sector_id = GameData.instance.sector_map.current_sector_id
+		new_sector_id = GameData.instance.sector_map.get_selected_sector()
+		if new_sector_id == null:
+			# No selected sector = undocking same sector, don't advance time
+			new_sector_id = old_sector_id
+
+	# Only advance time if actually navigating to a different sector
+	if old_sector_id != new_sector_id and game_root.world.world_simulation != null:
+		game_root.world.world_simulation.advance_time_minutes(5.0)
+
 	game_root.world.sector_controller.redeploy_sector()
 	game_root.fade_from_black()

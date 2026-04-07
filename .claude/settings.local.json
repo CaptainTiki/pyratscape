@@ -4,7 +4,8 @@
       "Bash(xargs wc:*)",
       "Bash(find /c/Repo/pyratscape -type d -not -path */.*)",
       "Bash(xargs grep:*)",
-      "Bash(godot --path . --editor)"
+      "Bash(godot --path . --editor)",
+      "Bash(godot --path . --headless --check-only)"
     ]
   }
 }

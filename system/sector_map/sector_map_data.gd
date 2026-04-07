@@ -10,6 +10,7 @@ class SectorData extends RefCounted:
 	var has_poi: bool = false
 	var is_cleared: bool = false
 	var is_current: bool = false
+	var available_resources: int = 0
 
 var sectors: Array[SectorData] = []
 var connections: Array[Vector2i] = []

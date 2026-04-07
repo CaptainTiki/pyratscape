@@ -19,6 +19,7 @@ enum SectorState {
 var station_manager: StationManager = null
 var enemy_spawner: EnemySpawner = null
 var activity_tracker: ActivityTracker = null
+var world_simulation: WorldSimulation = null
 
 var sector_state: int = SectorController.SectorState.DEPLOYING
 var target_asteroid_count: int = 7
@@ -43,6 +44,7 @@ func setup(world: WorldRoot) -> void:
 	station_manager = world.station_manager
 	enemy_spawner = world.enemy_spawner
 	activity_tracker = world.activity_tracker
+	world_simulation = world.world_simulation
 	reporter.activity_tracker = activity_tracker
 	spawner.setup(world)
 
@@ -60,11 +62,24 @@ func setup(world: WorldRoot) -> void:
 
 func begin_sector_cycle() -> void:
 	spawner.clear()
+
+	var current_sector_id = 0
+	if GameData.instance != null and GameData.instance.sector_map != null:
+		current_sector_id = GameData.instance.sector_map.current_sector_id
+
 	_read_sector_params()
 	sector_state = SectorController.SectorState.DEPLOYING
 	reporter.deploying()
 	station_manager.begin_deploy()
 	spawner.spawn_asteroids(target_asteroid_count)
+
+	# Update world simulation with current sector
+	if world_simulation != null:
+		world_simulation.set_current_player_sector(current_sector_id)
+
+	# Update spawner with current sector
+	enemy_spawner.current_sector_id = current_sector_id
+
 	sector_changed.emit()
 
 func redeploy_sector() -> void:
@@ -91,6 +106,11 @@ func try_interact_at_station() -> bool:
 		spawner.player.process_mode = Node.PROCESS_MODE_DISABLED
 	enemy_spawner.stop_spawning()
 	activity_tracker.stop_tracking()
+
+	# Pause world simulation while docked
+	if world_simulation != null:
+		world_simulation.pause_simulation()
+
 	sector_changed.emit()
 	return true
 
@@ -139,6 +159,11 @@ func on_station_deploy_finished() -> void:
 	station_manager.depart_after_launch()
 	enemy_spawner.start_spawning()
 	activity_tracker.start_tracking()
+
+	# Resume world simulation
+	if world_simulation != null:
+		world_simulation.resume_simulation()
+
 	reporter.station_launched()
 	sector_changed.emit()
 
@@ -167,6 +192,11 @@ func on_bay_closed() -> void:
 func on_enemy_destroyed(_enemy: EnemyShip) -> void:
 	activity_tracker.add_activity(2.0)
 	reporter.enemy_down()
+
+	# Decrement enemy count in world simulation
+	if GameData.instance != null and GameData.instance.enemy_forces != null:
+		GameData.instance.enemy_forces.remove_enemy_from_sector(GameData.instance.sector_map.current_sector_id, "fighter")
+
 	_check_win_condition()
 	sector_changed.emit()
 
@@ -198,6 +228,9 @@ func on_run_completed() -> void:
 			var current: SectorMapData.SectorData = GameData.instance.sector_map.get_current_sector()
 			if current != null:
 				current.is_cleared = true
+		# Clear enemies from this sector
+		if GameData.instance.enemy_forces != null:
+			GameData.instance.enemy_forces.set_enemies_in_sector(GameData.instance.sector_map.current_sector_id, 0, 0, 0)
 
 # --- Internal helpers ---
 
@@ -206,15 +239,32 @@ func _check_win_condition() -> void:
 
 func _read_sector_params() -> void:
 	var map_sector: SectorMapData.SectorData = null
+	var current_sector_id: int = 0
 	if GameData.instance != null and GameData.instance.sector_map != null:
 		map_sector = GameData.instance.sector_map.get_current_sector()
+		current_sector_id = GameData.instance.sector_map.current_sector_id
+
 	var cap: int = 2
 	var asteroid_count: int = 7
 	var danger: float = 0.3
+
 	if map_sector != null:
-		cap = maxi(1, map_sector.enemy_fleet_size)
 		asteroid_count = map_sector.asteroid_count
 		danger = map_sector.danger_level
+
+	# Read enemy count from world simulation (dynamic, not static)
+	if GameData.instance != null and GameData.instance.enemy_forces != null:
+		cap = maxi(1, GameData.instance.enemy_forces.get_enemies_in_sector(current_sector_id))
+
+		# Initialize sector resources if not already set
+		var sector_forces = GameData.instance.enemy_forces.get_sector_forces(current_sector_id)
+		if sector_forces != null and sector_forces.available_resources == 0:
+			var resources_from_asteroids = asteroid_count * 100  # ~100 scrap per asteroid
+			sector_forces.available_resources = resources_from_asteroids
+	elif map_sector != null:
+		# Fallback to old system if enemy_forces not initialized
+		cap = maxi(1, map_sector.enemy_fleet_size)
+
 	target_asteroid_count = asteroid_count
 	enemy_spawner.reset(cap)
 	activity_tracker.reset(danger)
