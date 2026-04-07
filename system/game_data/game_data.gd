@@ -18,11 +18,15 @@ var player_tractor_range: float = 7.5
 var cleared_runs: int = 0
 var sector_map: SectorMapData = null
 var enemy_forces: EnemyForces = null
+var ship_config: Dictionary = {}  # slot_name: BaseComponent Resource path or data
+
+var static_world: StaticWorldData = null
 
 func _ready() -> void:
 	instance = self
 
 func reset_for_new_game() -> void:
+	ship_config.clear()
 	scrap = 0
 	crystals = 0
 	station_integrity = 100
@@ -36,10 +40,39 @@ func reset_for_new_game() -> void:
 	player_mining_damage = 18.0
 	player_tractor_range = 7.5
 	cleared_runs = 0
+	# Load the hand-authored test world instead of the procedural generator.
+	# The static world provides labeled sectors, factories, and an explicit
+	# enemy home so the simulation has a deterministic substrate to run on.
+	static_world = TestWorld01.build()
 	sector_map = SectorMapData.new()
-	sector_map.generate()
+	sector_map.load_from_static(static_world)
 	enemy_forces = EnemyForces.new()
-	enemy_forces.initialize_sectors(sector_map.sectors.size(), 1800)
+	enemy_forces.initialize_from_static(static_world)
+
+func save_ship_config():
+	var file = FileAccess.open("user://ship_config.json", FileAccess.WRITE)
+	if file:
+		var data = {}
+		for slot in ship_config:
+			data[slot] = {
+				"slot_type": ship_config[slot].slot_type if ship_config[slot] else "",
+				"icon_color": ship_config[slot].icon_color.to_html(false) if ship_config[slot] else ""
+			}
+		file.store_string(JSON.stringify(data))
+		file.close()
+
+func load_ship_config():
+	var file = FileAccess.open("user://ship_config.json", FileAccess.READ)
+	if file:
+		var data = JSON.parse_string(file.get_as_text())
+		file.close()
+		if data:
+			for slot in data:
+				if data[slot].slot_type != "":
+					# Load proto component by type/color
+					ship_config[slot] = BaseComponent.new()
+					ship_config[slot].slot_type = data[slot].slot_type
+					ship_config[slot].icon_color = Color.html(data[slot].icon_color)
 
 func repair_player_full() -> void:
 	player_hull = player_max_hull
@@ -62,34 +95,4 @@ func spend(cost_scrap: int, cost_crystals: int) -> bool:
 		return false
 	scrap -= cost_scrap
 	crystals -= cost_crystals
-	return true
-
-func buy_damage_upgrade() -> bool:
-	var cost_scrap: int = 20 + cleared_runs * 4
-	if not spend(cost_scrap, 0):
-		return false
-	player_damage += 3.0
-	return true
-
-func buy_fire_rate_upgrade() -> bool:
-	var cost_scrap: int = 25 + cleared_runs * 5
-	if not spend(cost_scrap, 1):
-		return false
-	player_fire_rate = maxf(0.08, player_fire_rate - 0.015)
-	return true
-
-func buy_hull_upgrade() -> bool:
-	var cost_scrap: int = 18 + cleared_runs * 4
-	if not spend(cost_scrap, 0):
-		return false
-	player_ship_max_hull += 12
-	player_max_hull += 12
-	player_hull = player_max_hull
-	return true
-
-func buy_mining_upgrade() -> bool:
-	var cost_scrap: int = 15 + cleared_runs * 3
-	if not spend(cost_scrap, 0):
-		return false
-	player_mining_damage += 4.0
 	return true

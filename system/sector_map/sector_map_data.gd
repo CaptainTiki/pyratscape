@@ -32,6 +32,42 @@ func generate(sector_count: int = 14) -> void:
 	sectors[0].danger_level = 0.1
 	sectors[0].asteroid_count = 7
 
+func load_from_static(static_world: StaticWorldData) -> void:
+	# Populate this SectorMapData from a hand-authored StaticWorldData.
+	# Use this instead of generate() when tuning against a fixed map.
+	sectors.clear()
+	connections.clear()
+	selected_sector_id = -1
+	current_sector_id = 0
+
+	if static_world == null:
+		push_warning("load_from_static called with null StaticWorldData")
+		return
+
+	var errors := static_world.validate()
+	if not errors.is_empty():
+		for e in errors:
+			push_warning("StaticWorldData validation: %s" % e)
+
+	for s in static_world.sectors:
+		var sector := SectorData.new()
+		sector.id = s.id
+		sector.map_position = s.map_position
+		sector.asteroid_count = s.asteroid_count
+		sector.available_resources = s.starting_resources
+		sector.enemy_fleet_size = s.starting_fighters
+		sector.danger_level = clampf(float(s.starting_fighters) / 6.0, 0.0, 1.0)
+		sector.has_poi = s.has_poi
+		sectors.append(sector)
+
+	for c in static_world.connections:
+		connections.append(c)
+
+	current_sector_id = static_world.get_player_start_id()
+	var current := get_sector_by_id(current_sector_id)
+	if current != null:
+		current.is_current = true
+
 func get_sector_by_id(id: int) -> SectorData:
 	if id >= 0 and id < sectors.size():
 		return sectors[id]

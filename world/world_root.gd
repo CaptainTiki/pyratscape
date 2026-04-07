@@ -25,7 +25,15 @@ func _ready() -> void:
 	world_simulation.name = "WorldSimulation"
 	add_child(world_simulation)
 	if GameData.instance != null:
-		world_simulation.initialize(GameData.instance.enemy_forces, GameData.instance.sector_map, 0)
+		var player_start_id := 0
+		if GameData.instance.static_world != null:
+			player_start_id = GameData.instance.static_world.get_player_start_id()
+		world_simulation.initialize(
+			GameData.instance.enemy_forces,
+			GameData.instance.sector_map,
+			player_start_id,
+			GameData.instance.static_world,
+		)
 		world_simulation.forced_deploy_required.connect(_on_forced_deploy_required)
 
 	# Now set up spawner with simulation awareness

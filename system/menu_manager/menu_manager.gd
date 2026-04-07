@@ -32,6 +32,9 @@ func init_menus() -> void:
 	_add_menu(Menu.Type.STATION, Prefabs.station_menu_scene)
 	_add_menu(Menu.Type.SECTOR_MAP, Prefabs.sector_map_menu_scene)
 	_add_menu(Menu.Type.PAUSE, Prefabs.pause_menu_scene)
+	_add_menu(Menu.Type.HANGAR, Prefabs.hangar_menu_scene)
+	_add_menu(Menu.Type.PRODUCTION, Prefabs.production_menu_scene)
+	_add_menu(Menu.Type.RESEARCH, Prefabs.research_menu_scene)
 
 func _add_menu(type: Menu.Type, scene: PackedScene) -> void:
 	var menu: Menu = scene.instantiate()

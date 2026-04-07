@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**PyratScape** is a 3D space action/roguelike game built with Godot 4.6 (Forward Plus renderer, Jolt Physics, D3D12 on Windows). Players pilot a ship to mine asteroids, fight enemies, and manage upgrades across procedurally-generated sectors.
+**PyratScape** is a 3D space action/roguelike game built with Godot 4.6 (Forward Plus renderer, Jolt Physics, D3D12 on Windows). Players pilot a ship to mine asteroids, fight enemies, and manage upgrades across a handcrafted world built of interconnected sectors.
 
 ## Running the Project
 
@@ -78,3 +78,14 @@ PlayerInput → PlayerShip._physics_process()
 - Scene files (`.tscn`) and scripts (`.gd`) are co-located by feature under `system/`, `world/`, and `ui/`
 - Prefabs/scene paths are centralized in `system/prefabs.gd`
 - Node UID references are used instead of string paths for scene instantiation
+
+- ALWAYS use double quotes " " for all strings
+- NEVER escape double quotes with backslashes (\") inside code blocks.
+- NEVER output JSON, never wrap code in extra quotes, never add escape sequences for quotes.
+- When showing dictionary literals, arrays, or any code containing strings, output the code EXACTLY as it should appear in a .gd file.
+
+- Example of CORRECT output for this pattern:
+data[slot] = {
+    "slot_type": ship_config[slot].slot_type if ship_config[slot] else "",
+    "icon_color": ship_config[slot].icon_color.to_html(false) if ship_config[slot] else ""
+}

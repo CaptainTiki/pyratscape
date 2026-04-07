@@ -94,6 +94,12 @@ custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 text = "Back to Station"
 
+[node name="SkipTimeButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer/ButtonRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "Skip 5 Minutes"
+
 [node name="DeployButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer/ButtonRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 40)
@@ -101,4 +107,5 @@ layout_mode = 2
 text = "Deploy to Sector"
 
 [connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ButtonRow/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ButtonRow/SkipTimeButton" to="." method="_on_skip_time_button_pressed"]
 [connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ButtonRow/DeployButton" to="." method="_on_deploy_button_pressed"]

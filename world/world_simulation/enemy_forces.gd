@@ -11,6 +11,7 @@ class SectorForces:
 
 var sectors: Dictionary[int, SectorForces] = {}
 var total_game_time_minutes: float = 0.0
+var factory_sectors: Array[int] = []  # sectors that contain factories
 
 func _init() -> void:
 	pass
@@ -29,6 +30,25 @@ func initialize_sectors(sector_count: int, initial_resources_per_sector: int) ->
 
 	# Seed with initial enemy distribution (simple: spread some fighters around)
 	_distribute_initial_enemies(sector_count)
+
+func initialize_from_static(static_world: StaticWorldData) -> void:
+	# Initialize sectors and starting enemy counts from a hand-authored world.
+	# Factory, resource, and starting fighter/miner counts are all read from
+	# the per-sector data, so the world is fully deterministic on load.
+	sectors.clear()
+	if static_world == null:
+		return
+
+	for s in static_world.sectors:
+		var forces := SectorForces.new()
+		forces.sector_id = s.id
+		forces.available_resources = s.starting_resources
+		forces.fighter_count = s.starting_fighters
+		forces.miner_count = s.starting_miners
+		forces.factory_count = 1 if s.is_factory else 0
+		sectors[s.id] = forces
+
+	factory_sectors = static_world.get_factory_ids()
 
 func reset_for_new_game() -> void:
 	sectors.clear()
@@ -89,14 +109,19 @@ func set_enemies_in_sector(sector_id: int, fighter_count: int, miner_count: int 
 func advance_game_time(minutes: float) -> void:
 	total_game_time_minutes += minutes
 
-func _distribute_initial_enemies(sector_count: int) -> void:
-	# Seed with a few scattered enemies to make the world feel dangerous
-	# Start sector (0) has minimal threats
-	if sector_count > 0:
-		sectors[0].fighter_count = 0
+func set_factory_sectors(factory_ids: Array[int]) -> void:
+	factory_sectors = factory_ids.duplicate()
+	# Initialize factory count in those sectors
+	for sector_id in factory_ids:
+		if sectors.has(sector_id):
+			sectors[sector_id].factory_count = 1
 
-	# Distribute a handful of fighters across other sectors
-	var enemy_seeds = [1, 2, 3, 1, 2]  # Simple pattern: 5 fighters across early sectors
-	for i in range(mini(enemy_seeds.size(), sector_count - 1)):
-		if i + 1 < sector_count:
-			sectors[i + 1].fighter_count = enemy_seeds[i]
+func has_factory(sector_id: int) -> bool:
+	return sector_id in factory_sectors
+
+func get_factory_sectors() -> Array[int]:
+	return factory_sectors.duplicate()
+
+func _distribute_initial_enemies(sector_count: int) -> void:
+	# No initial distribution - all enemies come from factories now
+	pass

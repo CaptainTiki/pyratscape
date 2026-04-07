@@ -86,25 +86,17 @@ horizontal_alignment = 1
 [node name="Separator" type="HSeparator" parent="CenterPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="UpgradeDamageButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
+[node name="HangarButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "Upgrade Damage (20 Scrap)"
+text = "Hangar"
 
-[node name="UpgradeRateButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
+[node name="ProductionButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "Upgrade Fire Rate (25 Scrap, 1 Crystal)"
+text = "Production"
 
-[node name="UpgradeHullButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
+[node name="ResearchButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "Upgrade Hull (18 Scrap)"
-
-[node name="UpgradeMiningButton" type="Button" parent="CenterPanel/MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Upgrade Mining (15 Scrap)"
+text = "Research"
 
 [node name="Separator2" type="HSeparator" parent="CenterPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -124,9 +116,8 @@ custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
 text = "Redeploy Sector"
 
-[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/UpgradeDamageButton" to="." method="_on_upgrade_damage_button_pressed"]
-[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/UpgradeRateButton" to="." method="_on_upgrade_rate_button_pressed"]
-[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/UpgradeHullButton" to="." method="_on_upgrade_hull_button_pressed"]
-[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/UpgradeMiningButton" to="." method="_on_upgrade_mining_button_pressed"]
+[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/HangarButton" to="." method="_on_hangar_button_pressed"]
+[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ProductionButton" to="." method="_on_production_button_pressed"]
+[connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ResearchButton" to="." method="_on_research_button_pressed"]
 [connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ButtonRow/SectorMapButton" to="." method="_on_sector_map_button_pressed"]
 [connection signal="pressed" from="CenterPanel/MarginContainer/VBoxContainer/ButtonRow/RedeployButton" to="." method="_on_redeploy_button_pressed"]

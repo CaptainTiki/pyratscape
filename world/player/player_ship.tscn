@@ -64,7 +64,7 @@ script = ExtResource("1")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=488868441]
 shape = SubResource("CapsuleShape3D_player")
 
-[node name="ShipVisual" type="Node3D" parent="."]
+[node name="ShipVisual" type="Node3D" parent="." unique_id=1354962560]
 
 [node name="Body" type="MeshInstance3D" parent="ShipVisual" unique_id=2138893995]
 material_override = SubResource("StandardMaterial3D_body")
@@ -85,14 +85,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.5)
 material_override = SubResource("StandardMaterial3D_engine")
 mesh = SubResource("BoxMesh_engine")
 
-[node name="PodVisual" type="Node3D" parent="."]
+[node name="PodVisual" type="Node3D" parent="." unique_id=1894123059]
 visible = false
 
-[node name="PodBody" type="MeshInstance3D" parent="PodVisual"]
+[node name="PodBody" type="MeshInstance3D" parent="PodVisual" unique_id=1424365629]
 material_override = SubResource("StandardMaterial3D_pod_body")
 mesh = SubResource("SphereMesh_pod")
 
-[node name="PodEngine" type="MeshInstance3D" parent="PodVisual"]
+[node name="PodEngine" type="MeshInstance3D" parent="PodVisual" unique_id=1719649021]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.6)
 material_override = SubResource("StandardMaterial3D_pod_engine")
 mesh = SubResource("BoxMesh_pod_engine")

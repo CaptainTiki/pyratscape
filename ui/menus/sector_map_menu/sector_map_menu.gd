@@ -4,6 +4,7 @@ class_name SectorMapMenu
 @onready var sector_map_control: SectorMap = %SectorMapControl
 @onready var sector_info_label: Label = %SectorInfoLabel
 @onready var deploy_button: Button = %DeployButton
+@onready var skip_time_button: Button = %SkipTimeButton
 
 func _ready() -> void:
 	super._ready()
@@ -20,6 +21,13 @@ func show_menu() -> void:
 		sector_info_label.text = "Select a connected sector to deploy."
 	if sector_map_control != null and GameData.instance != null and GameData.instance.sector_map != null:
 		sector_map_control.set_map_data(GameData.instance.sector_map)
+
+	# Listen for time advancement to refresh the map
+	var main: Main = get_tree().current_scene as Main
+	if main != null and main.game_root != null and main.game_root.world != null:
+		if main.game_root.world.world_simulation != null:
+			if not main.game_root.world.world_simulation.world_time_advanced.is_connected(_on_world_time_advanced):
+				main.game_root.world.world_simulation.world_time_advanced.connect(_on_world_time_advanced)
 
 func _on_sector_map_sector_selected(sector_id: int) -> void:
 	if GameData.instance == null or GameData.instance.sector_map == null:
@@ -56,6 +64,18 @@ func _on_deploy_button_pressed() -> void:
 	var main: Main = get_tree().current_scene as Main
 	if main != null:
 		main.redeploy_current_game()
+
+func _on_world_time_advanced(minutes: float) -> void:
+	# Refresh the sector map display when time advances
+	if sector_map_control != null:
+		sector_map_control.queue_redraw()
+
+func _on_skip_time_button_pressed() -> void:
+	# Skip 5 minutes of game time to watch the simulation
+	var main: Main = get_tree().current_scene as Main
+	if main != null and main.game_root != null and main.game_root.world != null:
+		if main.game_root.world.world_simulation != null:
+			main.game_root.world.world_simulation.advance_time_minutes(5.0)
 
 func _on_back_button_pressed() -> void:
 	if manager != null:

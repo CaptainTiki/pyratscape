@@ -8,6 +8,7 @@ var hovered_sector_id: int = -1
 
 const SECTOR_RADIUS: float = 12.0
 const FLEET_DOT_RADIUS: float = 4.0
+const FLEET_DOT_MAX_SIZE: float = 8.0  # Cap dot size to prevent covering map
 const ASTEROID_DOT_RADIUS: float = 2.5
 const HIT_RADIUS: float = 18.0
 const PADDING: float = 30.0
@@ -87,14 +88,24 @@ func _draw_sector(sector: SectorMapData.SectorData) -> void:
 		draw_arc(pos, SECTOR_RADIUS + 5.0, 0.0, TAU, 32, COLOR_SECTOR_SELECTED, 2.0)
 	if sector.id == hovered_sector_id and is_reachable:
 		draw_arc(pos, SECTOR_RADIUS + 4.0, 0.0, TAU, 32, COLOR_HOVER_RING, 1.5)
-	if sector.enemy_fleet_size > 0 and not sector.is_current:
-		var fleet_color: Color = _get_fleet_color(sector.enemy_fleet_size)
-		var dot_count: int = mini(sector.enemy_fleet_size, 6)
-		var dot_size: float = FLEET_DOT_RADIUS + float(sector.enemy_fleet_size) * 0.5
+	# Read enemy count from simulation, not static data
+	var enemy_count: int = 0
+	if GameData.instance != null and GameData.instance.enemy_forces != null:
+		enemy_count = GameData.instance.enemy_forces.get_enemies_in_sector(sector.id)
+
+	if enemy_count > 0 and not sector.is_current:
+		var fleet_color: Color = _get_fleet_color(enemy_count)
+		var dot_count: int = mini(enemy_count, 6)
+		# Cap dot size so it doesn't cover the map
+		var dot_size: float = mini(FLEET_DOT_RADIUS + float(enemy_count) * 0.3, FLEET_DOT_MAX_SIZE)
 		for i in range(dot_count):
 			var angle: float = (float(i) / float(dot_count)) * TAU - PI * 0.5
 			var offset: Vector2 = Vector2(cos(angle), sin(angle)) * (SECTOR_RADIUS + 8.0)
 			draw_circle(pos + offset, dot_size, fleet_color)
+
+		# Draw enemy count label below the sector
+		var label_pos: Vector2 = pos + Vector2(0.0, SECTOR_RADIUS + 14.0)
+		draw_string(get_theme_font(""), label_pos, str(enemy_count), HORIZONTAL_ALIGNMENT_CENTER, -1, 11, Color.WHITE)
 	if sector.asteroid_count > 0:
 		var cluster_count: int = mini(sector.asteroid_count / 2, 4)
 		for i in range(cluster_count):
