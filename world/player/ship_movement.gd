@@ -20,6 +20,7 @@ var collision_handler: CollisionDamageHandler = null:
 
 var current_speed: float = 0.0
 var boost_timer: float = 0.0
+var external_velocity: Vector3 = Vector3.ZERO
 
 var _double_tap_timer: Timer
 
@@ -65,9 +66,10 @@ func _handle_movement(delta: float) -> void:
 	else:
 		current_speed = move_toward(current_speed, 0.0, friction_rate * delta)
 
-	ship.velocity = -ship.global_basis.z * current_speed
+	ship.velocity = -ship.global_basis.z * current_speed + external_velocity
 	ship.move_and_slide()
 	ship.global_position.y = 1.25
+	external_velocity = Vector3.ZERO
 
 func _on_collision_hit(damage: int) -> void:
 	current_speed *= -0.35

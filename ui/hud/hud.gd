@@ -14,12 +14,14 @@ var _connected_player: PlayerShip = null
 @onready var docking_label: Label = %DockingLabel
 @onready var scrap_bar: ProgressBar = %ScrapBar
 @onready var crystal_bar: ProgressBar = %CrystalBar
+@onready var minimap: MinimapDisplay = %MinimapDisplay
 @onready var damage_flash: ColorRect = $DamageFlash
 
 func bind_world(new_world: Node3D) -> void:
 	world = new_world as WorldRoot
 	if world != null:
 		world.world_state_changed.connect(_refresh)
+	minimap.world = world
 	_refresh()
 
 func _refresh() -> void:

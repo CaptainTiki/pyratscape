@@ -77,3 +77,5 @@ func _update_visuals() -> void:
 	else:
 		material.albedo_color = Color(0.45, 1.0, 0.95, 1)
 		material.emission = Color(0.15, 0.7, 0.8, 1)
+	var s: float = 0.5 if amount <= 2 else 1.0
+	mesh_node.scale = Vector3(s, s, s)

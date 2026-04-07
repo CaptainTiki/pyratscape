@@ -31,14 +31,19 @@ func _ready() -> void:
 	tractor.ship = self
 	tractor.tractor_area = tractor_area
 	tractor.tractor_visual = tractor_visual
+	tractor.initialize()
 	_sync_from_game_data()
 
 func _input(event: InputEvent) -> void:
 	movement.handle_input_event(event)
+	if event.is_action_pressed("call_station") and world != null:
+		world.sector_controller.try_call_or_open_bay()
 
 func _physics_process(delta: float) -> void:
 	if not visible:
 		return
+	if world != null:
+		movement.external_velocity = world.sector_controller.get_bay_pull_force(global_position)
 	movement.tick(delta)
 	weapons.tick(delta)
 	tractor.tick(delta)

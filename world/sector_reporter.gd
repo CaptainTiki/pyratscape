@@ -48,3 +48,12 @@ func move_closer_to_dock() -> void:
 
 func station_fallen() -> void:
 	mission_message = "The station has fallen. Press Esc to return to the menu."
+
+func bay_opened(seconds: int) -> void:
+	mission_message = "Bay open. Station pulling you in — %ds. Move in range and press F to dock." % seconds
+
+func bay_extended(seconds: int) -> void:
+	mission_message = "Bay timer reset. %ds remaining. Press F when in range to dock." % seconds
+
+func bay_timed_out() -> void:
+	mission_message = "Bay closed. Press R to reopen."

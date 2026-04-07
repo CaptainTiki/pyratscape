@@ -50,11 +50,13 @@ func setup(world: WorldRoot) -> void:
 	station_manager.inbound_finished.connect(on_station_inbound_finished)
 	station_manager.dock_finished.connect(on_station_dock_finished)
 	station_manager.redeploy_finished.connect(on_station_redeploy_finished)
+	station_manager.bay_closed.connect(on_bay_closed)
 	enemy_spawner.enemy_destroyed.connect(on_enemy_destroyed)
 	enemy_spawner.wave_spawned.connect(on_wave_spawned)
 	activity_tracker.activity_changed.connect(on_activity_changed)
 	activity_tracker.run_completed.connect(on_run_completed)
 	spawner.asteroid_mined_out.connect(on_asteroid_mined_out)
+	spawner.asteroid_split.connect(on_asteroid_split)
 
 func begin_sector_cycle() -> void:
 	spawner.clear()
@@ -100,6 +102,23 @@ func call_station_to_sector() -> void:
 	reporter.station_inbound()
 	sector_changed.emit()
 
+func try_call_or_open_bay() -> void:
+	if sector_state in [SectorController.SectorState.DOCKING, SectorController.SectorState.DOCKED]:
+		return
+	if not station_manager.station_present:
+		call_station_to_sector()
+		return
+	if station_manager.bay_open:
+		station_manager.open_bay()
+		reporter.bay_extended(station_manager.get_bay_time_remaining())
+	else:
+		station_manager.open_bay()
+		reporter.bay_opened(station_manager.get_bay_time_remaining())
+	sector_changed.emit()
+
+func get_bay_pull_force(player_pos: Vector3) -> Vector3:
+	return station_manager.get_bay_pull_force(player_pos)
+
 func apply_station_damage(amount: int) -> void:
 	station_manager.apply_damage(amount)
 	if GameData.instance != null and GameData.instance.station_integrity <= 0:
@@ -139,6 +158,10 @@ func on_station_redeploy_finished() -> void:
 	reporter.redeploy_complete()
 	sector_changed.emit()
 
+func on_bay_closed() -> void:
+	reporter.bay_timed_out()
+	sector_changed.emit()
+
 # --- Combat / activity event handlers ---
 
 func on_enemy_destroyed(_enemy: EnemyShip) -> void:
@@ -154,6 +177,11 @@ func on_wave_spawned() -> void:
 func on_asteroid_mined_out() -> void:
 	activity_tracker.add_activity(5.0)
 	reporter.asteroid_mined()
+	_check_win_condition()
+	sector_changed.emit()
+
+func on_asteroid_split() -> void:
+	activity_tracker.add_activity(1.0)
 	_check_win_condition()
 	sector_changed.emit()
 

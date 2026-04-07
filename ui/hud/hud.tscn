@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://ui/hud/hud.gd" id="1"]
+[ext_resource type="Script" path="res://ui/hud/minimap_display.gd" id="2_minimap"]
 
 [sub_resource type="StyleBoxFlat" id="SBF_panel"]
 bg_color = Color(0.05, 0.05, 0.1, 0.72)
@@ -207,16 +208,11 @@ offset_top = -168.0
 offset_bottom = -8.0
 theme_override_styles/panel = SubResource("SBF_panel")
 
-[node name="MinimapLabel" type="Label" parent="MinimapPanel"]
+[node name="MinimapDisplay" type="Control" parent="MinimapPanel"]
+unique_name_in_owner = true
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-text = "MINIMAP"
-horizontal_alignment = 1
-vertical_alignment = 1
-theme_override_font_sizes/font_size = 10
-modulate = Color(0.4, 0.5, 0.6, 0.7)
+clip_contents = true
+script = ExtResource("2_minimap")
 
 [node name="DamageFlash" type="ColorRect" parent="."]
 layout_mode = 1

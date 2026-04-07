@@ -5,6 +5,7 @@ const PLAYER_SCENE: PackedScene = preload("res://world/player/player_ship.tscn")
 const ASTEROID_SCENE: PackedScene = preload("res://world/props/asteroid_node.tscn")
 
 signal asteroid_mined_out
+signal asteroid_split
 
 var actor_layer: Node3D = null
 var projectile_layer: Node3D = null
@@ -68,6 +69,7 @@ func spawn_asteroids(count: int) -> void:
 		var asteroid: AsteroidNode = ASTEROID_SCENE.instantiate() as AsteroidNode
 		asteroid.global_position = spawn_position
 		asteroid.mined_out.connect(_on_asteroid_mined_out)
+		asteroid.split.connect(_on_asteroid_split)
 		actor_layer.add_child(asteroid)
 		asteroids_remaining += 1
 
@@ -77,3 +79,16 @@ func register_pickup(pickup: ResourcePickup) -> void:
 func _on_asteroid_mined_out() -> void:
 	asteroids_remaining = maxi(0, asteroids_remaining - 1)
 	asteroid_mined_out.emit()
+
+func _on_asteroid_split(origin: Vector3, child_size: AsteroidNode.AsteroidSize, child_count: int) -> void:
+	asteroids_remaining = maxi(0, asteroids_remaining - 1)
+	for i in range(child_count):
+		var offset := Vector3(randf_range(-2.5, 2.5), 0.0, randf_range(-2.5, 2.5))
+		var child: AsteroidNode = ASTEROID_SCENE.instantiate() as AsteroidNode
+		child.size = child_size
+		child.global_position = origin + offset
+		child.mined_out.connect(_on_asteroid_mined_out)
+		child.split.connect(_on_asteroid_split)
+		actor_layer.add_child(child)
+		asteroids_remaining += 1
+	asteroid_split.emit()

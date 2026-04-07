@@ -1,17 +1,18 @@
 [gd_scene format=3 uid="uid://b5fxb3bq62sxl"]
 
 [ext_resource type="Script" uid="uid://bmnsxciia3031" path="res://world/world_root.gd" id="1"]
-[ext_resource type="Script" path="res://world/camera_rig.gd" id="2_camrig"]
-[ext_resource type="Script" path="res://world/enemy_spawner.gd" id="3_espawn"]
-[ext_resource type="Script" path="res://world/activity_tracker.gd" id="4_activity"]
-[ext_resource type="Script" path="res://world/station_manager.gd" id="5_station"]
-[ext_resource type="Script" path="res://world/sector_controller.gd" id="6_sector"]
-[ext_resource type="Script" path="res://world/sector_spawner.gd" id="7_sspawn"]
-[ext_resource type="Script" path="res://world/sector_reporter.gd" id="8_sreport"]
+[ext_resource type="Script" uid="uid://nowon1u6navm" path="res://world/camera_rig.gd" id="2_camrig"]
+[ext_resource type="Script" uid="uid://duguxe88s1a35" path="res://world/enemy_spawner.gd" id="3_espawn"]
+[ext_resource type="Script" uid="uid://hvxagleoxvsk" path="res://world/activity_tracker.gd" id="4_activity"]
+[ext_resource type="Script" uid="uid://dm2rqxcgp310g" path="res://world/station_manager.gd" id="5_station"]
+[ext_resource type="Script" uid="uid://chdxejvsgri8n" path="res://world/sector_controller.gd" id="6_sector"]
+[ext_resource type="Script" uid="uid://bjnbld6g8c6lf" path="res://world/sector_spawner.gd" id="7_sspawn"]
+[ext_resource type="Script" uid="uid://c7d4i7jmudd4y" path="res://world/sector_reporter.gd" id="8_sreport"]
+[ext_resource type="Script" path="res://world/star_field.gd" id="9_starfield"]
 
 [sub_resource type="Environment" id="Environment_1"]
-background_mode = 2
-background_color = Color(0.005, 0.008, 0.02, 1)
+background_mode = 1
+background_color = Color(0.0, 0.0, 0.0, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.5, 0.6, 0.9, 1)
 ambient_light_energy = 0.9
@@ -25,14 +26,10 @@ emission = Color(0.9, 0.95, 1, 1)
 radius = 0.12
 height = 0.24
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
-size = Vector3(200, 1, 200)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
-albedo_color = Color(0.03, 0.04, 0.08, 1)
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
-size = Vector2(200, 200)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_station"]
+height = 2.5
+radius = 3.8
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_station"]
 albedo_color = Color(0.19, 0.46, 0.76, 1)
@@ -40,10 +37,6 @@ albedo_color = Color(0.19, 0.46, 0.76, 1)
 [sub_resource type="CylinderMesh" id="CylinderMesh_station"]
 top_radius = 3.0
 bottom_radius = 4.0
-height = 2.5
-
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_station"]
-radius = 3.8
 height = 2.5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dish"]
@@ -86,22 +79,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -62, 12, -36)
 material_override = SubResource("StandardMaterial3D_star")
 mesh = SubResource("SphereMesh_star")
 
-[node name="Ground" type="StaticBody3D" parent="." unique_id=1856130848]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=895802636]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-shape = SubResource("BoxShape3D_ground")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground" unique_id=1151467471]
-transform = Transform3D(1, 0, 0, 0, -3.6199901e-06, 1, 0, -1, -3.6199901e-06, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_ground")
-mesh = SubResource("PlaneMesh_ground")
-
 [node name="StationAnchor" type="StaticBody3D" parent="." unique_id=695837133]
-collision_layer = 1
-collision_mask = 0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-
+collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StationAnchor" unique_id=200000001]
 shape = SubResource("CylinderShape3D_station")
@@ -121,6 +101,9 @@ collision_layer = 0
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StationAnchor/StationArea" unique_id=1550777914]
 shape = SubResource("SphereShape3D_station_range")
 
+[node name="StarField" type="Node3D" parent="." unique_id=200100001]
+script = ExtResource("9_starfield")
+
 [node name="Actors" type="Node3D" parent="." unique_id=1900655857]
 
 [node name="Projectiles" type="Node3D" parent="." unique_id=159519458]
@@ -134,20 +117,20 @@ script = ExtResource("2_camrig")
 [node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=861752085]
 current = true
 
-[node name="EnemySpawner" type="Node" parent="."]
+[node name="EnemySpawner" type="Node" parent="." unique_id=263747664]
 script = ExtResource("3_espawn")
 
-[node name="ActivityTracker" type="Node" parent="."]
+[node name="ActivityTracker" type="Node" parent="." unique_id=368657301]
 script = ExtResource("4_activity")
 
-[node name="StationManager" type="Node" parent="."]
+[node name="StationManager" type="Node" parent="." unique_id=935539233]
 script = ExtResource("5_station")
 
-[node name="SectorController" type="Node" parent="."]
+[node name="SectorController" type="Node" parent="." unique_id=655292847]
 script = ExtResource("6_sector")
 
-[node name="SectorSpawner" type="Node" parent="SectorController"]
+[node name="SectorSpawner" type="Node" parent="SectorController" unique_id=1543509602]
 script = ExtResource("7_sspawn")
 
-[node name="SectorReporter" type="Node" parent="SectorController"]
+[node name="SectorReporter" type="Node" parent="SectorController" unique_id=1148676958]
 script = ExtResource("8_sreport")

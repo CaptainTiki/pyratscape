@@ -1,130 +1,168 @@
 # PyratScape — Dev Handoff
 **Date**: 2026-04-06
-**Session**: Combat Rebalance + HUD Refactor
+**Session**: Asteroid Splitting, Tractor Overhaul, Station Calling, Minimap, Starscape
 
 ---
 
 ## What Was Done This Session
 
-### Combat Rebalance (Phase 1A / 1B / 1C)
+### Asteroid Splitting
+**`world/props/asteroid_node.gd`** — Full rewrite with size system:
+- `AsteroidSize` enum: LARGE / MEDIUM / SMALL
+- `split` signal (emits origin, child_size, child_count) replaces direct `mined_out` on LARGE/MEDIUM
+- `mined_out` now only fires on SMALL (final destruction)
+- Scale auto-configured per size: LARGE=1.0×, MEDIUM=0.55×, SMALL=0.3×
+- Drop table per size: LARGE/MEDIUM drop 1-2 scrap bits (small pickup); SMALL drops 4-5 scrap chunk + 0-2 crystals
+- `apply_tractor_drag()` added for tractor beam support
 
-**`world/enemy_spawner.gd`** — All knobs now `@export` grouped in Inspector:
-- `start_delay`: 5.0s (was hardcoded 3.5s)
-- `spawn_interval_min`: 2.0s (was 0.8s) — players have breathing room
-- `spawn_interval_activity_scale`: 0.04 (was 0.08) — half ramp speed
-- `live_cap_max`: 6 (was 8)
-- `activity_per_wave_size`: 42.0 (was 28.0) — slower escalation to 3-enemy waves
+**`world/sector_spawner.gd`** — Handles `split` signal:
+- Spawns 2-3 MEDIUM children from LARGE, 3-4 SMALL children from MEDIUM
+- Children scattered ±2.5 units from origin
+- `asteroids_remaining` adjusts correctly (parent -1, children +N)
+- New `asteroid_split` signal emitted up to SectorController
 
-**`world/enemies/enemy_ship.gd`** — Also grouped, plus new behaviors:
-- `move_speed`: 10.0 (was 13.0)
-- `turn_speed`: 3.0 (was hardcoded 6.0) — sluggish turning, enemies overshoot
-- `fire_cooldown`: 1.4s (was 1.0s)
-- `projectile_damage`: 5.0 (was 8.0)
-- `engage_range`: 18.0 (now exported)
-- `preferred_range_variance`: ±2.0 — each enemy picks a slightly different orbit distance
-- `engage_delay_min/max`: 0.5–1.5s — enemies in a wave don't all rush at once
+**`world/sector_controller.gd`** — Wired `asteroid_split`:
+- `on_asteroid_split()` adds 1.0 activity per split (vs 5.0 for full mine-out)
 
-**`world/health_component.gd`** — Added `damaged` signal (emitted on every hit)
-
-**`world/player/hull_component.gd`** — Also emits `damaged` signal in its override
-
-**`world/enemies/enemy_ship.gd`** — Hit flash + death explosion:
-- Hit flash: body material duplicated per instance, tweens white → original (0.15s)
-- Death explosion: programmatic sphere spawned at death position, scales 1→4 + fades (0.35s)
+**`world/props/resource_pickup.gd`** — Bits vs Chunks visual:
+- Pickups with amount ≤2 render at 0.5× mesh scale (bits)
+- Pickups with amount ≥4 render at 1.0× mesh scale (chunks)
 
 ---
 
-### HUD Refactor (Phase 2A–D)
+### Tractor Beam Overhaul
+**`world/player/tractor_system.gd`** — Full rewrite:
+- State machine: IDLE → CHARGING → LOCKED
+- 80° cone (±40° from nose) — dot product filter, nothing outside cone can lock
+- 1.5s lock-on delay with beam fading up from near-invisible → full brightness
+- Swinging off target mid-charge resets to IDLE
+- On LOCKED: pickups magnet to ship as before; asteroids get `apply_tractor_drag()` friction pull (4 u/s)
+- All key params `@export`: `cone_half_angle_deg`, `lock_on_time`, `asteroid_pull_strength`
+- Beam material duplicated per-instance in `initialize()` (called from PlayerShip._ready)
 
-**File structure:**
-```
-ui/hud/hud.tscn + hud.gd          ← Main game HUD (always visible during play)
-ui/hud/debug_overlay.tscn + .gd   ← Debug overlay (F3 to toggle, hidden by default)
-```
+**`world/player/player_ship.gd`** — calls `tractor.initialize()` in `_ready()`
 
-**`ui/hud/hud.tscn`** — Minimalist bar-based layout:
-- **Ship panel** (top-left): Hull bar (red), Power bar (blue, placeholder 100%), Cargo bar (yellow, scrap+crystals/50 max), Missile label (placeholder "MSSL --")
-- **Station panel** (top-right): STA status text, DOCK status text, Scrap bar (gold), Crystal bar (cyan), Other bar (green, future use)
-- **Minimap panel** (bottom-right): 160×160 placeholder with "MINIMAP" label
-- **DamageFlash**: Full-screen red ColorRect, flashes 30% opacity on player hit, fades over 0.4s
+**`world/player/player_ship.tscn`** — TractorArea `collision_mask` bumped from 8 → 9 (picks up asteroids on layer 1)
 
-**`ui/hud/debug_overlay.tscn`** — Text-heavy overlay with all game state:
-- Hull / Station, Scrap / Crystals / Enemies / Asteroids / Activity, Mission message, Keybind hints, Sector state
-- **Does NOT touch `visible` in `_refresh()`** — visibility controlled by F3 only
+---
 
-**`system/game_root/game_root.gd`** — Wires both HUDs:
-```gdscript
-@onready var hud: Hud = $CanvasLayer/HUD
-@onready var debug_overlay: DebugOverlay = $CanvasLayer/DebugOverlay
-# F3 toggles debug_overlay.visible in _unhandled_input()
-```
+### Station Calling (R Key)
+**`project.godot`** — Added `call_station` input action (R key, physical keycode 82)
+
+**`world/station_manager.gd`** — Bay state machine:
+- `open_bay()` / `close_bay()` — opens a 25s docking window
+- `_process()` counts down `_bay_timer`, emits `bay_closed` on timeout
+- `get_bay_pull_force(player_pos)` — returns pull vector toward station (6 u/s, within 20 units) when bay open
+- `bay_opened` / `bay_closed` signals
+- All tunable via `@export`: `bay_duration` (25s), `bay_pull_strength` (6.0), `bay_pull_radius` (20.0)
+
+**`world/sector_controller.gd`** — `try_call_or_open_bay()`:
+- No station present → calls it in
+- Station present, bay closed → opens bay
+- Station present, bay open → resets timer
+- `get_bay_pull_force()` delegates to StationManager
+
+**`world/sector_reporter.gd`** — Bay messages: `bay_opened()`, `bay_extended()`, `bay_timed_out()`
+
+**`world/player/ship_movement.gd`** — Added `external_velocity: Vector3` applied each frame then zeroed
+
+**`world/player/player_ship.gd`** — R key fires `try_call_or_open_bay()`; bay pull force fed into `movement.external_velocity` each physics frame
+
+---
+
+### Minimap
+**`ui/hud/minimap_display.gd`** — New `Control` subclass using `_draw()`:
+- Redraws every frame via `queue_redraw()` in `_process()`
+- Player = white forward-pointing chevron (rotates with ship heading)
+- Enemies = red filled circles
+- Asteroids = gray-blue dots, 3 sizes (4.5r / 2.8r / 1.6r)
+- Station = green diamond, clamped to radar edge when out of range
+- Two faint grid rings at 40% and 75% radius for depth reference
+- `radar_range` export (default 55 world units)
+
+**`ui/hud/hud.tscn`** — Replaced `MinimapLabel` placeholder with `MinimapDisplay` Control node
+
+**`ui/hud/hud.gd`** — Wires `minimap.world` in `bind_world()`
+
+---
+
+### Starscape + Ground Removal
+**`world/star_field.gd`** — New `Node3D` autobuilds 3 MultiMesh star layers on `_ready()`:
+- y=-65: 600 stars, cool blue-white, spread 1400u (deep background, barely moves)
+- y=-22: 220 stars, warm white, spread 900u (mid layer)
+- y=-5:   80 stars, pure white, spread 500u (near layer, most parallax)
+- All unshaded, shadow casting off, per-star scale variation 0.7–1.4×
+- Fixed RNG seed (77142) — same starfield every run
+
+**`world/world_root.tscn`** — Removed Ground StaticBody3D entirely (mesh + collision + sub-resources). Environment background set to pure black (mode=1). StarField node added.
 
 ---
 
 ## Current File State
 
 ### New files created this session
-- `ui/hud/hud.tscn` + `ui/hud/hud.gd`
-- `ui/hud/debug_overlay.tscn` + `ui/hud/debug_overlay.gd`
-
-### Orphaned (no longer referenced, safe to delete)
-- `ui/hud/game_hud.tscn` + `ui/hud/game_hud.gd`
-- `ui/hud/minimalist_hud.tscn` + `ui/hud/minimalist_hud.gd`
+- `world/star_field.gd`
+- `ui/hud/minimap_display.gd`
 
 ### Modified files
-- `world/enemy_spawner.gd`
-- `world/enemies/enemy_ship.gd`
-- `world/health_component.gd`
-- `world/player/hull_component.gd`
-- `system/game_root/game_root.gd`
-- `system/game_root/game_root.tscn`
+- `world/props/asteroid_node.gd`
+- `world/sector_spawner.gd`
+- `world/sector_controller.gd`
+- `world/sector_reporter.gd`
+- `world/props/resource_pickup.gd`
+- `world/player/tractor_system.gd`
+- `world/player/player_ship.gd`
+- `world/player/player_ship.tscn`
+- `world/station_manager.gd`
+- `world/player/ship_movement.gd`
+- `ui/hud/hud.gd`
+- `ui/hud/hud.tscn`
+- `world/world_root.tscn`
+- `project.godot`
 
 ---
 
 ## What's Next (Priority Order)
 
-### 1. Asteroid Splitting + Pickup Variety (do together)
-- Large → 2-3 Mediums → 3-4 Smalls → destroyed
-- Drops at every stage, higher chance on final destruction
-- **Bits** (1-2 units, small) vs **Chunks** (4-5 units, large) pickup variants
-- Visual distinction: size scale, glow, rotation speed
+### 1. Docking Menu UI
+- Research tab, production tab, station health display
+- Spend scrap/crystals on upgrades
+- Current hook: `dock_sequence_finished` signal on SectorController fires when docking completes
 
-### 2. Tractor Beam Overhaul
-- Forward-facing 60-90° cone (not omnidirectional sphere)
-- 1.5-2s lock-on delay with charging visual
-- Friction drag on targeted asteroids
-- Current file: `world/player/tractor_system.gd`
+### 2. Escape Pod on Death
+- On hull destroyed: spawn escape pod at ship position instead of queue_free
+- Pod drifts, no controls, 10-15s before "rescue"
+- No save system yet — on pod death, reset to new game
+- Current hook: `_on_hull_destroyed()` in `player_ship.gd`
 
-### 3. Station Calling (R key)
-- R key calls station into docking mode, opens bay
-- Projects a safe zone (Area3D) that auto-pulls ship toward dock
-- 20-30s timer, auto-closes, re-press to reopen
-- Current docking flow: `world/sector_controller.gd`, `world/station_manager.gd`
+### 3. Sector Map Improvements
+- Enemy fleet movement between sectors (per-turn)
+- Navigate button (confirm sector choice and redeploy)
+- Skip Time button (advance enemy fleets, maybe trigger events)
 
-### 4. Minimap
-- Replace placeholder with actual SubViewport radar
-- Player = center, asteroids = size-coded dots, enemies = red, station = green
-
-### 5. Medium Priority (later)
-- Docking menu UI (research, production, station health)
-- Escape pod on death (no save system yet, reset to new game on pod death)
-- Sector map: enemy fleet movement, Navigate button, Skip Time button
+### 4. Polish / Tuning Pass
+- Minimap: consider showing pickup dots (small yellow/cyan)
+- Tractor beam: visual charging FX on ship (glow pulse near muzzle?)
+- Asteroid split: screen shake or camera bump on large split
+- Station bay: visual indicator on station when bay is open (light/glow)
 
 ---
 
 ## Key Architecture Notes
 
-- **Signal flow**: `sector_controller.sector_changed` → `world.world_state_changed` → `hud._refresh()` — both HUDs subscribe to this
-- **Player access**: `world.sector_controller.player` (spawned dynamically per sector, null before ACTIVE state)
-- **GameData**: Autoload singleton — all cross-sector persistence lives here (hull, scrap, crystals, upgrades)
-- **Enemy spawner**: Inspector-tunable via `@export_group` — tweak spawn timing without touching code
-- **Enemy ship**: Inspector-tunable via `@export_group` — movement, combat, and engagement params all exposed
+- **Signal flow**: `sector_controller.sector_changed` → `world.world_state_changed` → `hud._refresh()` — both HUDs subscribe
+- **Player access**: `world.sector_controller.player` (spawned dynamically, null before ACTIVE state)
+- **GameData**: Autoload singleton — all cross-sector persistence (hull, scrap, crystals, upgrades)
+- **Asteroid chain**: LARGE splits to MEDIUM (2-3), MEDIUM splits to SMALL (3-4), SMALL fires `mined_out`
+- **Tractor**: IDLE→CHARGING(1.5s)→LOCKED; cone ±40°; resets if target leaves cone mid-charge
+- **Bay pull**: applied via `movement.external_velocity` each physics frame; zeroed after `move_and_slide()`
+- **Starfield**: purely visual Node3D, no gameplay coupling, fixed seed for consistency
 
 ---
 
 ## Known Placeholders / TODOs
-- `PowerBar` in HUD: always 100% — real power system not yet implemented
+- `PowerBar` in HUD: always 100% — power system not yet implemented
 - `MissileLabel` in HUD: shows "MSSL --" — ammo system not yet implemented
 - `OtherBar` in station panel: always 0% — awaiting third resource type
-- Minimap: placeholder panel only
-- Missile ammo: decided to be limited pool, but tracking not wired yet
+- Minimap: pickups not shown (could add as small dots later)
+- Docking menu: not yet implemented (shows sector map immediately on dock)
