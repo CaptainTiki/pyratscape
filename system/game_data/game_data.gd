@@ -19,6 +19,7 @@ var cleared_runs: int = 0
 var sector_map: SectorMapData = null
 var enemy_forces: EnemyForces = null
 var ship_config: Dictionary = {}  # slot_name: BaseComponent Resource path or data
+var component_inventory: Array[BaseComponent] = []
 
 var static_world: StaticWorldData = null
 
@@ -27,6 +28,8 @@ func _ready() -> void:
 
 func reset_for_new_game() -> void:
 	ship_config.clear()
+	component_inventory.clear()
+	_add_starter_components()
 	scrap = 0
 	crystals = 0
 	station_integrity = 100
@@ -73,6 +76,27 @@ func load_ship_config():
 					ship_config[slot] = BaseComponent.new()
 					ship_config[slot].slot_type = data[slot].slot_type
 					ship_config[slot].icon_color = Color.html(data[slot].icon_color)
+
+func _add_starter_components() -> void:
+	var engine_l := EngineComponent.new()
+	engine_l.name = "Basic Engine"
+	component_inventory.append(engine_l)
+
+	var engine_r := EngineComponent.new()
+	engine_r.name = "Basic Engine"
+	component_inventory.append(engine_r)
+
+	var cannon := WeaponComponent.new()
+	cannon.name = "Pulse Cannon"
+	component_inventory.append(cannon)
+
+	var tractor := TractorComponent.new()
+	tractor.name = "Tractor Beam"
+	component_inventory.append(tractor)
+
+	var power := PowerComponent.new()
+	power.name = "Power Cell"
+	component_inventory.append(power)
 
 func repair_player_full() -> void:
 	player_hull = player_max_hull
